@@ -1,0 +1,83 @@
+{
+    "id": "e4475611-6a47-47a2-8730-e4d86d94a054",
+    "url": "https://fiu-uat.setu.co/consents/webview/e4475611-6a47-47a2-8730-e4d86d94a054",
+    "status": "ACTIVE",
+    "Detail": {
+        "DataConsumer": {
+            "type": "FIU",
+            "id": "setu-fiu-id"
+        },
+        "consentTypes": [
+            "TRANSACTIONS",
+            "PROFILE",
+            "SUMMARY"
+        ],
+        "DataProvider": {
+            "type": "AA",
+            "id": "onemoney-aa"
+        },
+        "Customer": {
+            "id": "8778942743@onemoney"
+        },
+        "Accounts": [
+            {
+                "fipId": "setu-fip",
+                "fiType": "DEPOSIT",
+                "maskedAccNumber": "XXXXXXXX1644",
+                "accType": "CURRENT",
+                "linkRefNumber": "731365c5-6787-42fc-923e-494bc107e5ad"
+            }
+        ],
+        "FIDataRange": {
+            "from": "2023-04-01T00:00:00.000Z",
+            "to": "2023-07-01T00:00:00.000Z"
+        },
+        "DataLife": {
+            "value": 1.0,
+            "unit": "MONTH"
+        },
+        "Frequency": {
+            "value": 30.0,
+            "unit": "MONTH"
+        },
+        "consentStart": "2023-07-31T08:02:54.592Z",
+        "DataFilter": [
+            {
+                "value": "1",
+                "operator": ">=",
+                "type": "TRANSACTIONAMOUNT"
+            }
+        ],
+        "fetchType": "PERIODIC",
+        "Purpose": {
+            "Category": {
+                "type": "string"
+            },
+            "code": "101",
+            "text": "Loan underwriting",
+            "refUri": "https://api.rebit.org.in/aa/purpose/101.xml"
+        },
+        "consentMode": "STORE",
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "consentExpiry": "2023-10-23T05:44:53.822Z"
+    },
+    "redirectUrl": "https://setu.co",
+    "PAN": "",
+    "context": [
+        {
+            "value": "CURRENT",
+            "key": "accounttype"
+        },
+        {
+            "value": "0",
+            "key": "error_code"
+        }
+    ],
+    "Usage": {
+        "lastUsed": null,
+        "count": "0"
+    },
+    "traceId": "1-64c76b08-60dbe9e665e8771e27a1dc41"
+}
