@@ -16,7 +16,7 @@ class _CFOnboardingThreeState extends State<CFOnboardingThree> {
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
           decoration: BoxDecoration(
-            color: Color.fromARGB(255, 248, 238, 213),
+            color: const Color.fromARGB(255, 248, 238, 213),
             borderRadius: BorderRadius.circular(20.0),
           ),
           child: Stack(

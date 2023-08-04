@@ -1,5 +1,7 @@
+import 'package:app/routes/cfroute_names.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:go_router/go_router.dart';
 
 class CFWelcome extends StatefulWidget {
   const CFWelcome({super.key});
@@ -76,6 +78,8 @@ class _CFWelcomeState extends State<CFWelcome> {
                       setState(() {
                         signUpClick = false;
                       });
+                      GoRouter.of(context)
+                          .pushNamed(CFRouteNames.signUpRouteName);
                     },
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 100),
@@ -115,6 +119,8 @@ class _CFWelcomeState extends State<CFWelcome> {
                       setState(() {
                         signInClick = false;
                       });
+                      GoRouter.of(context)
+                          .pushNamed(CFRouteNames.signInRouteName);
                     },
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 100),

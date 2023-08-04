@@ -1,4 +1,6 @@
+import 'package:app/pages/cfsignin.dart';
 import 'package:app/pages/cfonboarding.dart';
+import 'package:app/pages/cfsignup.dart';
 import 'package:app/pages/cfsplash.dart';
 import 'package:app/pages/cfwelcome.dart';
 import 'package:app/routes/cfroute_names.dart';
@@ -21,6 +23,16 @@ class CFRouter {
         name: CFRouteNames.welcomeRouteName,
         path: "/welcome",
         builder: (context, state) => const CFWelcome(),
+      ),
+      GoRoute(
+        name: CFRouteNames.signUpRouteName,
+        path: "/sign-up",
+        builder: (context, state) => const CFSignUp(),
+      ),
+      GoRoute(
+        name: CFRouteNames.signInRouteName,
+        path: "/sign-in",
+        builder: (context, state) => const CFSignIn(),
       ),
     ],
   );

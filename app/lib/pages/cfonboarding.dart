@@ -94,8 +94,8 @@ class _CFOnboardingState extends State<CFOnboarding> {
                             setState(() {
                               isPressed = true;
                             });
-                            GoRouter.of(context).pushReplacementNamed(
-                                CFRouteNames.welcomeRouteName);
+                            GoRouter.of(context)
+                                .pushNamed(CFRouteNames.welcomeRouteName);
                           }
                         : null,
                     onTapUp: index == 2

@@ -19,9 +19,9 @@ class _CFSplashState extends State<CFSplash> {
 
   void checkLogin() async {
     if (FirebaseAuth.instance.currentUser != null) {
-      print('log in please');
     } else {
-      GoRouter.of(context).pushNamed(CFRouteNames.onboardingRouteName);
+      GoRouter.of(context)
+          .pushReplacementNamed(CFRouteNames.onboardingRouteName);
     }
   }
 
