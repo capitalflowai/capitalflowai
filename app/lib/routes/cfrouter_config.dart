@@ -1,9 +1,10 @@
-import 'package:app/pages/cfsignin.dart';
-import 'package:app/pages/cfonboarding.dart';
-import 'package:app/pages/cfsignup.dart';
-import 'package:app/pages/cfsplash.dart';
-import 'package:app/pages/cfwelcome.dart';
-import 'package:app/routes/cfroute_names.dart';
+import 'package:CapitalFlowAI/pages/cfhome.dart';
+import 'package:CapitalFlowAI/pages/cfsignin.dart';
+import 'package:CapitalFlowAI/pages/cfonboarding.dart';
+import 'package:CapitalFlowAI/pages/cfsignup.dart';
+import 'package:CapitalFlowAI/pages/cfsplash.dart';
+import 'package:CapitalFlowAI/pages/cfwelcome.dart';
+import 'package:CapitalFlowAI/routes/cfroute_names.dart';
 import 'package:go_router/go_router.dart';
 
 class CFRouter {
@@ -33,6 +34,11 @@ class CFRouter {
         name: CFRouteNames.signInRouteName,
         path: "/sign-in",
         builder: (context, state) => const CFSignIn(),
+      ),
+      GoRoute(
+        name: CFRouteNames.homeRouteName,
+        path: "/home",
+        builder: (context, state) => const CFHome(),
       ),
     ],
   );

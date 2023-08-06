@@ -1,16 +1,20 @@
+import 'package:CapitalFlowAI/pages/cfsplash.dart';
+import 'package:CapitalFlowAI/routes/cfroute_names.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-class CFSignUp extends StatefulWidget {
+class CFSignUp extends ConsumerStatefulWidget {
   const CFSignUp({super.key});
 
   @override
-  State<CFSignUp> createState() => _CFSignUpState();
+  ConsumerState<CFSignUp> createState() => _CFSignUpState();
 }
 
-class _CFSignUpState extends State<CFSignUp> {
+class _CFSignUpState extends ConsumerState<CFSignUp> {
   final _formKey = GlobalKey<FormState>();
   bool selectSign = false;
   String errorMessage = "";
@@ -227,7 +231,7 @@ class _CFSignUpState extends State<CFSignUp> {
                           ),
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -289,12 +293,17 @@ class _CFSignUpState extends State<CFSignUp> {
                   if (_formKey.currentState!.validate() &&
                       (!passwordError1 && !passwordError2 && !passwordError3)) {
                     try {
-                      final credential = await FirebaseAuth.instance
+                      await FirebaseAuth.instance
                           .createUserWithEmailAndPassword(
                         email: emailController.text,
                         password: passwordController.text,
                       );
-                      print(credential);
+                      ref.read(userProvider.notifier).state =
+                          FirebaseAuth.instance.currentUser;
+                      if (mounted) {
+                        GoRouter.of(context)
+                            .goNamed(CFRouteNames.homeRouteName);
+                      }
                     } on FirebaseAuthException catch (e) {
                       if (e.code == 'email-already-in-use') {
                         errorMessage =
@@ -355,7 +364,8 @@ class _CFSignUpState extends State<CFSignUp> {
                     ? Text(
                         errorMessage,
                         style: const TextStyle(
-                            color: Color.fromARGB(255, 220, 39, 26)),
+                          color: Color.fromARGB(255, 220, 39, 26),
+                        ),
                       )
                     : Container(),
               ),
