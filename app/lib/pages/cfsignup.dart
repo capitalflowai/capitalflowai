@@ -1,6 +1,5 @@
 import 'package:CapitalFlowAI/backend/cfsetu.dart';
 import 'package:CapitalFlowAI/pages/cfsplash.dart';
-import 'package:CapitalFlowAI/pages/cfwebview.dart';
 import 'package:CapitalFlowAI/routes/cfroute_names.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

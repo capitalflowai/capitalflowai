@@ -1,6 +1,4 @@
 import 'dart:convert';
-
-import 'package:CapitalFlowAI/routes/cfroute_names.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
@@ -11,7 +9,7 @@ class SetuAPI {
     final finalDate =
         DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(dateTime.toUtc());
 
-    final oneYearLaterTemp = dateTime.add(Duration(days: 365));
+    final oneYearLaterTemp = dateTime.add(const Duration(days: 365));
 
     final oneYearLater = DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
         .format(oneYearLaterTemp.toUtc());
@@ -48,7 +46,6 @@ class SetuAPI {
         "context": [
           {"key": "accounttype", "value": "CURRENT"}
         ],
-        // "redirectUrl": "capitalflowai://consent"
         "redirectUrl": "https://setu.co"
       }),
     );
