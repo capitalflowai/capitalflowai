@@ -63,7 +63,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '640702612599',
     projectId: 'capitalflowai-62f4a',
     storageBucket: 'capitalflowai-62f4a.appspot.com',
-    iosClientId: '640702612599-udob7bk1onc3jd3bd7lf7n1nalogh5ur.apps.googleusercontent.com',
-    iosBundleId: 'com.example.app',
+    iosClientId:
+        '640702612599-udob7bk1onc3jd3bd7lf7n1nalogh5ur.apps.googleusercontent.com',
+    iosBundleId: 'com.capitalflowai',
   );
 }

@@ -14,16 +14,12 @@ class _CFHomeState extends State<CFHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: TextButton(
-            child: const Text("out"),
-            onPressed: () {
-              FirebaseAuth.instance.signOut();
-              GoRouter.of(context).goNamed(CFRouteNames.splashRouteName);
-            },
-          ),
-        ),
+      body: IconButton(
+        icon: const Icon(Icons.close),
+        onPressed: () {
+          FirebaseAuth.instance.signOut();
+          GoRouter.of(context).goNamed(CFRouteNames.welcomeRouteName);
+        },
       ),
     );
   }

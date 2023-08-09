@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:640702612599:android:0edb88c17d960967cf7272",
         "android_client_info": {
-          "package_name": "com.example.app"
+          "package_name": "com.capitalflowai"
         }
       },
       "oauth_client": [
@@ -34,7 +34,7 @@
               "client_id": "640702612599-udob7bk1onc3jd3bd7lf7n1nalogh5ur.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.app"
+                "bundle_id": "com.capitalflowai"
               }
             }
           ]

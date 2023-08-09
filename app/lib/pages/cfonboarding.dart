@@ -1,6 +1,6 @@
-import 'package:CapitalFlowAI/pages/components/cfonboardingp1.dart';
-import 'package:CapitalFlowAI/pages/components/cfonboardingp2.dart';
-import 'package:CapitalFlowAI/pages/components/cfonboardingp3.dart';
+import 'package:CapitalFlowAI/components/cfonboardingp1.dart';
+import 'package:CapitalFlowAI/components/cfonboardingp2.dart';
+import 'package:CapitalFlowAI/components/cfonboardingp3.dart';
 import 'package:CapitalFlowAI/routes/cfroute_names.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';

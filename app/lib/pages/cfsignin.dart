@@ -195,8 +195,10 @@ class _CFSignInState extends ConsumerState<CFSignIn> {
                                 password: passwordController.text);
                         ref.read(userProvider.notifier).state =
                             (userCredTemp.user);
-                        GoRouter.of(context)
-                            .goNamed(CFRouteNames.homeRouteName);
+                        if (mounted) {
+                          GoRouter.of(context)
+                              .goNamed(CFRouteNames.homeRouteName);
+                        }
                       } on FirebaseAuthException catch (e) {
                         if (e.code == 'user-not-found') {
                           errorMessage = 'No user found for that email.';
