@@ -5,6 +5,6 @@ class CFRouteNames {
   static const String signUpRouteName = "sign-up";
   static const String webviewRouteName = "webview";
   static const String signInRouteName = "sign-in";
-  static const String initConsentRouteName = "consent-sign-up";
   static const String homeRouteName = "home";
+  static const String midasRouteName = "midas";
 }

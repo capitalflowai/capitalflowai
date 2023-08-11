@@ -1,3 +1,4 @@
+import 'package:CapitalFlowAI/components/cfuser.dart';
 import 'package:CapitalFlowAI/pages/cfsplash.dart';
 import 'package:CapitalFlowAI/routes/cfroute_names.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -193,8 +194,8 @@ class _CFSignInState extends ConsumerState<CFSignIn> {
                             .signInWithEmailAndPassword(
                                 email: emailController.text,
                                 password: passwordController.text);
-                        ref.read(userProvider.notifier).state =
-                            (userCredTemp.user);
+                        ref.read(userProvider.notifier).state = CFUser.fromMap(
+                            {}, FirebaseAuth.instance.currentUser);
                         if (mounted) {
                           GoRouter.of(context)
                               .goNamed(CFRouteNames.homeRouteName);

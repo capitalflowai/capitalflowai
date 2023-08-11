@@ -77,9 +77,9 @@ class _CFWebViewState extends ConsumerState<CFWebView> {
             Container(
               margin: const EdgeInsets.only(bottom: 5.0),
               padding: const EdgeInsets.symmetric(vertical: 2.5),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
+              decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                boxShadow: const [
                   BoxShadow(
                     offset: Offset(0, 2),
                     spreadRadius: 1.0,

@@ -1,5 +1,5 @@
 import 'package:CapitalFlowAI/pages/cfhome.dart';
-import 'package:CapitalFlowAI/pages/cfinitconsent.dart';
+import 'package:CapitalFlowAI/pages/cfmidas.dart';
 import 'package:CapitalFlowAI/pages/cfsignin.dart';
 import 'package:CapitalFlowAI/pages/cfonboarding.dart';
 import 'package:CapitalFlowAI/pages/cfsignup.dart';
@@ -36,7 +36,6 @@ class CFRouter {
         name: CFRouteNames.webviewRouteName,
         path: "/webview:url",
         builder: (context, state) {
-          print(state.pathParameters);
           final query = state.pathParameters['url'];
           return CFWebView(
             url: query,
@@ -49,14 +48,14 @@ class CFRouter {
         builder: (context, state) => const CFSignIn(),
       ),
       GoRoute(
-        name: CFRouteNames.initConsentRouteName,
-        path: "/consent-sign-up",
-        builder: (context, state) => const CFInitConsent(),
-      ),
-      GoRoute(
         name: CFRouteNames.homeRouteName,
         path: "/home",
         builder: (context, state) => const CFHome(),
+      ),
+      GoRoute(
+        name: CFRouteNames.midasRouteName,
+        path: "/midas",
+        builder: (context, state) => const CFMidas(),
       ),
     ],
   );

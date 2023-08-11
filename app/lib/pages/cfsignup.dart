@@ -1,6 +1,8 @@
 import 'package:CapitalFlowAI/backend/cfsetu.dart';
+import 'package:CapitalFlowAI/components/cfuser.dart';
 import 'package:CapitalFlowAI/pages/cfsplash.dart';
 import 'package:CapitalFlowAI/routes/cfroute_names.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -31,6 +33,7 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
   bool passwordError2 = true;
   bool passwordError3 = true;
   TextEditingController phoneController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   final RegExp emailRegex = RegExp(
@@ -100,6 +103,52 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                           isDense: true,
                           fillColor: const Color.fromARGB(255, 246, 246, 246),
                           hintText: "phone number",
+                          contentPadding: const EdgeInsets.only(
+                              top: 10.0, bottom: 10.0, left: 10.0, right: 10.0),
+                          filled: true,
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            borderSide: const BorderSide(
+                              color: Colors.transparent,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            borderSide: const BorderSide(
+                              color: Colors.transparent,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    //name
+                    Container(
+                      margin: const EdgeInsets.only(top: 55.0),
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            offset: const Offset(0, 4),
+                            spreadRadius: 1.0,
+                            blurRadius: 10.0,
+                            color: Colors.grey.shade300,
+                          ),
+                        ],
+                      ),
+                      child: TextFormField(
+                        controller: nameController,
+                        keyboardType: TextInputType.name,
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return "Name cannot be empty";
+                          }
+                          return null;
+                        },
+                        maxLength: 10,
+                        decoration: InputDecoration(
+                          counterText: "",
+                          isDense: true,
+                          fillColor: const Color.fromARGB(255, 246, 246, 246),
+                          hintText: "name",
                           contentPadding: const EdgeInsets.only(
                               top: 10.0, bottom: 10.0, left: 10.0, right: 10.0),
                           filled: true,
@@ -351,28 +400,72 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                                     //   GoRouter.of(context).pushNamed(
                                     //       CFRouteNames.initConsentRouteName);
                                     // });
+
                                     try {
                                       await FirebaseAuth.instance
                                           .createUserWithEmailAndPassword(
                                         email: emailController.text,
                                         password: passwordController.text,
                                       );
-                                      ref.read(userProvider.notifier).state =
-                                          FirebaseAuth.instance.currentUser;
+                                      FirebaseAuth.instance.currentUser!
+                                          .updateDisplayName(
+                                              nameController.text);
                                       Map response =
                                           await SetuAPI.createConsent(
                                               phoneController.text);
-
                                       if (response.isNotEmpty) {
                                         if (mounted) {
                                           GoRouter.of(context).pushNamed(
                                               "webview",
                                               pathParameters: {
                                                 'url': response['id']
-                                              }).then((value) {
-                                            GoRouter.of(context).goNamed(
-                                                CFRouteNames
-                                                    .initConsentRouteName);
+                                              }).then((value) async {
+                                            FirebaseAuth.instance.currentUser!
+                                                .reload();
+                                            if (ref
+                                                .read(
+                                                    consentAcceptCheck.notifier)
+                                                .state) {
+                                              Map consentDetails =
+                                                  await SetuAPI.getConsent(
+                                                      response['id']);
+                                              print(consentDetails);
+                                              ref
+                                                  .read(userProvider.notifier)
+                                                  .state = CFUser.fromMap({
+                                                'consentID': response['id'],
+                                                'hasConsented': true,
+                                                'consentDetails': consentDetails
+                                              }, FirebaseAuth.instance.currentUser);
+                                              FirebaseFirestore.instance
+                                                  .collection("users")
+                                                  .doc(ref
+                                                      .read(
+                                                          userProvider.notifier)
+                                                      .state!
+                                                      .uid)
+                                                  .set(ref
+                                                      .read(
+                                                          userProvider.notifier)
+                                                      .state!
+                                                      .toMap());
+                                            } else {
+                                              ref
+                                                      .read(userProvider.notifier)
+                                                      .state =
+                                                  CFUser.fromMap(
+                                                      {
+                                                    'consentID': '',
+                                                    'hasConsented': false,
+                                                    'consentDetails': {}
+                                                  },
+                                                      FirebaseAuth.instance
+                                                          .currentUser);
+                                            }
+                                            if (mounted) {
+                                              GoRouter.of(context).goNamed(
+                                                  CFRouteNames.homeRouteName);
+                                            }
                                           });
                                         }
                                       }

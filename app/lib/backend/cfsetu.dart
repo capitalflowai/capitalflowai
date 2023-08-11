@@ -54,4 +54,24 @@ class SetuAPI {
     returnData = {'id': decoded['id'], 'url': decoded['url']};
     return returnData;
   }
+
+  static Future<Map> getConsent(String consentID) async {
+    http.Response response = await http.get(
+      Uri.parse(
+        'https://fiu-uat.setu.co/consents/$consentID',
+      ),
+      headers: {
+        'x-client-id': '95074533-43ae-4f7a-855c-ff1245d76936',
+        'x-client-secret': 'ba62d6f5-e9ba-4f18-8b0b-d60d959b9eb1',
+      },
+    );
+    Map<String, dynamic> finalResp = {};
+    Map decodedResp = json.decode(response.body);
+    print(decodedResp['Detail']);
+    finalResp['dataLife'] = decodedResp['Detail']['DataLife'];
+    finalResp['expiry'] = decodedResp['Detail']['consentExpiry'];
+    finalResp['FIDataRange'] = decodedResp['Detail']['FIDataRange'];
+
+    return finalResp;
+  }
 }
