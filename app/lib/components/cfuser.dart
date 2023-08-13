@@ -6,7 +6,7 @@ class CFUser {
   String uid = "";
   String consentID = "";
   bool hasConsented = false;
-  Map<String, String> consentDetails = {};
+  Map<String, dynamic> consentDetails = {};
   CFUser({
     required this.name,
     required this.email,

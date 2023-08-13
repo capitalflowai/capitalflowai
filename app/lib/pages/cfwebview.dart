@@ -1,9 +1,9 @@
 import 'package:CapitalFlowAI/pages/cfsignup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 class CFWebView extends ConsumerStatefulWidget {
   final String? url;
@@ -14,53 +14,15 @@ class CFWebView extends ConsumerStatefulWidget {
 }
 
 class _CFWebViewState extends ConsumerState<CFWebView> {
+  final GlobalKey webViewKey = GlobalKey();
+
+  InAppWebViewController? webViewController;
   int progress = 0;
   bool doNotSetState = false;
-  WebViewController controller = WebViewController()
-    ..setJavaScriptMode(JavaScriptMode.unrestricted);
 
   @override
   void initState() {
     super.initState();
-
-    controller.setNavigationDelegate(
-      NavigationDelegate(
-        onProgress: (value) {
-          if (!doNotSetState) {
-            if (value != 100) {
-              progress = value;
-            } else {
-              progress = 0;
-            }
-            setState(() {});
-          }
-        },
-        onPageStarted: (String url) {},
-        onPageFinished: (String url) {},
-        onWebResourceError: (WebResourceError error) {},
-        onNavigationRequest: (NavigationRequest request) {
-          if (request.url.startsWith('https://setu.co')) {
-            if (request.url.contains("true")) {
-              ref.watch(consentAcceptCheck.notifier).state = true;
-            }
-            doNotSetState = true;
-            setState(() {});
-            Future.delayed(const Duration(milliseconds: 1), () {
-              Navigator.of(context).pop();
-            });
-
-            return NavigationDecision.prevent;
-          }
-          return NavigationDecision.navigate;
-        },
-      ),
-    );
-    controller.loadRequest(
-      Uri.https(
-        "fiu-uat.setu.co",
-        "/consents/webview/${widget.url}",
-      ),
-    );
   }
 
   @override
@@ -77,9 +39,9 @@ class _CFWebViewState extends ConsumerState<CFWebView> {
             Container(
               margin: const EdgeInsets.only(bottom: 5.0),
               padding: const EdgeInsets.symmetric(vertical: 2.5),
-              decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                boxShadow: const [
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
                   BoxShadow(
                     offset: Offset(0, 2),
                     spreadRadius: 1.0,
@@ -116,7 +78,33 @@ class _CFWebViewState extends ConsumerState<CFWebView> {
                 ],
               ),
             ),
-            Expanded(child: WebViewWidget(controller: controller)),
+            Expanded(
+              child: InAppWebView(
+                key: webViewKey,
+                onWebViewCreated: (controller) {
+                  webViewController = controller;
+                },
+                initialUrlRequest: URLRequest(
+                  url: Uri.https(
+                    "fiu-uat.setu.co",
+                    "/consents/webview/${widget.url}",
+                  ),
+                ),
+                onProgressChanged: (controller, progress) {
+                  if (progress == 100) {}
+                },
+                onLoadStart: (controller, url) {
+                  if (url.toString().startsWith("https://setu.co")) {
+                    if (url.toString().contains("success")) {
+                      ref.read(consentAcceptCheck.notifier).state = true;
+                    }
+
+                    NavigationActionPolicy.CANCEL;
+                    GoRouter.of(context).pop();
+                  }
+                },
+              ),
+            ),
           ],
         ),
       ),

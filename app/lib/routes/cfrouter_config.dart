@@ -7,6 +7,7 @@ import 'package:CapitalFlowAI/pages/cfsplash.dart';
 import 'package:CapitalFlowAI/pages/cfwebview.dart';
 import 'package:CapitalFlowAI/pages/cfwelcome.dart';
 import 'package:CapitalFlowAI/routes/cfroute_names.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class CFRouter {
@@ -35,10 +36,22 @@ class CFRouter {
       GoRoute(
         name: CFRouteNames.webviewRouteName,
         path: "/webview:url",
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final query = state.pathParameters['url'];
-          return CFWebView(
-            url: query,
+
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: CFWebView(
+              url: query,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity:
+                    CurveTween(curve: Curves.decelerate).animate(animation),
+                child: child,
+              );
+            },
           );
         },
       ),

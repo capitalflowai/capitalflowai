@@ -1,3 +1,5 @@
+import 'package:CapitalFlowAI/backend/cfsetu.dart';
+import 'package:CapitalFlowAI/components/cfbalancecard.dart';
 import 'package:CapitalFlowAI/pages/cfsplash.dart';
 import 'package:CapitalFlowAI/routes/cfroute_names.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,9 +19,25 @@ class CFHome extends ConsumerStatefulWidget {
 class _CFHomeState extends ConsumerState<CFHome> {
   int bottomNavigationIndex = 0;
   bool isNotification = false;
+  double moneySpent = 1000.0;
+  double totalBudget = 5000.0;
+  double remainingRatio = 0.0;
+  double value = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    calcRemainingRatio();
+  }
+
+  void calcRemainingRatio() {
+    remainingRatio = 1 - (moneySpent / totalBudget);
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
+    print(ref.watch(userProvider.notifier).state!.name);
     return Scaffold(
       body: SafeArea(
         child: ListView(
@@ -29,7 +47,7 @@ class _CFHomeState extends ConsumerState<CFHome> {
             Container(
               width: double.maxFinite,
               padding: const EdgeInsets.only(
-                  left: 10.0, right: 10.0, top: 10.0, bottom: 10.0),
+                  left: 10.0, right: 20.0, top: 10.0, bottom: 10.0),
               decoration: BoxDecoration(
                 color: const Color.fromARGB(255, 241, 241, 243),
                 borderRadius: BorderRadius.circular(100.0),
@@ -88,9 +106,35 @@ class _CFHomeState extends ConsumerState<CFHome> {
                     ],
                   ),
                   Text(
-                      "Good Evening\n${ref.watch(userProvider.notifier).state!.name}"),
+                    "Good Evening,\n${(ref.watch(userProvider.notifier).state!.name).substring(0, 1).toUpperCase()}${(ref.watch(userProvider.notifier).state!.name).substring(1)}!",
+                  ),
                 ],
               ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 40.0),
+              child: CFBalance(
+                remainingPercentage: remainingRatio,
+                spentPercentage: 1 - remainingRatio,
+              ),
+            ),
+            Slider(
+              value: value,
+              onChanged: (val) {
+                setState(() {
+                  value = val;
+                  moneySpent = val * totalBudget;
+
+                  calcRemainingRatio();
+                });
+              },
+            ),
+            IconButton(
+              onPressed: () {
+                SetuAPI.createDataSesion(
+                    ref.watch(userProvider.notifier).state!.consentID);
+              },
+              icon: Icon(Icons.ac_unit),
             ),
           ],
         ),

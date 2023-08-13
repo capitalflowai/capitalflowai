@@ -132,8 +132,11 @@ class _CFMidasState extends State<CFMidas> {
             Align(
               alignment: Alignment.bottomCenter,
               child: Container(
-                margin: const EdgeInsets.only(
-                    left: 25.0, right: 25.0, bottom: 30.0),
+                margin: EdgeInsets.only(
+                  left: 25.0,
+                  right: 25.0,
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 30.0,
+                ),
                 padding:
                     const EdgeInsets.only(bottom: 5.0, left: 20.0, right: 10.0),
                 decoration: BoxDecoration(

@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 final consentAcceptCheck = StateProvider<bool>((ref) {
   bool temp = false;
@@ -23,6 +24,7 @@ class CFSignUp extends ConsumerStatefulWidget {
 }
 
 class _CFSignUpState extends ConsumerState<CFSignUp> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
   bool selectSign = false;
   bool selectConsent = false;
@@ -32,6 +34,7 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
   bool passwordError1 = true;
   bool passwordError2 = true;
   bool passwordError3 = true;
+  bool isLoadingConsent = false;
   TextEditingController phoneController = TextEditingController();
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -55,6 +58,7 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       body: SafeArea(
         child: Center(
           child: ListView(
@@ -342,6 +346,7 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                 duration: const Duration(milliseconds: 300),
               ),
               //sign up button
+
               GestureDetector(
                 onTapDown: (details) {
                   setState(() {
@@ -355,7 +360,7 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                   if (_formKey.currentState!.validate() &&
                       (!passwordError1 && !passwordError2 && !passwordError3)) {
                     showModalBottomSheet(
-                      context: context,
+                      context: _scaffoldKey.currentContext!,
                       builder: (context2) {
                         return StatefulBuilder(builder: (context2, state) {
                           return Container(
@@ -383,144 +388,174 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                                   "This will redirect you to an external website",
                                   style: TextStyle(fontWeight: FontWeight.w300),
                                 ),
-                                GestureDetector(
-                                  onTapDown: (details) {
-                                    state(() {
-                                      selectConsent = true;
-                                    });
-                                  },
-                                  onTapUp: (details) async {
-                                    state(() {
-                                      selectConsent = false;
-                                    });
-                                    // GoRouter.of(context).pushNamed("webview",
-                                    //     pathParameters: {
-                                    //       'url': "google.com"
-                                    //     }).then((value) {
-                                    //   GoRouter.of(context).pushNamed(
-                                    //       CFRouteNames.initConsentRouteName);
-                                    // });
-
-                                    try {
-                                      await FirebaseAuth.instance
-                                          .createUserWithEmailAndPassword(
-                                        email: emailController.text,
-                                        password: passwordController.text,
-                                      );
-                                      FirebaseAuth.instance.currentUser!
-                                          .updateDisplayName(
-                                              nameController.text);
-                                      Map response =
-                                          await SetuAPI.createConsent(
-                                              phoneController.text);
-                                      if (response.isNotEmpty) {
-                                        if (mounted) {
-                                          GoRouter.of(context).pushNamed(
-                                              "webview",
-                                              pathParameters: {
-                                                'url': response['id']
-                                              }).then((value) async {
-                                            FirebaseAuth.instance.currentUser!
-                                                .reload();
-                                            if (ref
-                                                .read(
-                                                    consentAcceptCheck.notifier)
-                                                .state) {
-                                              Map consentDetails =
-                                                  await SetuAPI.getConsent(
-                                                      response['id']);
-                                              print(consentDetails);
-                                              ref
-                                                  .read(userProvider.notifier)
-                                                  .state = CFUser.fromMap({
-                                                'consentID': response['id'],
-                                                'hasConsented': true,
-                                                'consentDetails': consentDetails
-                                              }, FirebaseAuth.instance.currentUser);
-                                              FirebaseFirestore.instance
-                                                  .collection("users")
-                                                  .doc(ref
-                                                      .read(
-                                                          userProvider.notifier)
-                                                      .state!
-                                                      .uid)
-                                                  .set(ref
-                                                      .read(
-                                                          userProvider.notifier)
-                                                      .state!
-                                                      .toMap());
-                                            } else {
-                                              ref
-                                                      .read(userProvider.notifier)
-                                                      .state =
-                                                  CFUser.fromMap(
-                                                      {
-                                                    'consentID': '',
-                                                    'hasConsented': false,
-                                                    'consentDetails': {}
-                                                  },
-                                                      FirebaseAuth.instance
-                                                          .currentUser);
-                                            }
-                                            if (mounted) {
-                                              GoRouter.of(context).goNamed(
-                                                  CFRouteNames.homeRouteName);
-                                            }
+                                !isLoadingConsent
+                                    ? GestureDetector(
+                                        onTapDown: (details) {
+                                          state(() {
+                                            selectConsent = true;
                                           });
-                                        }
-                                      }
-                                    } on FirebaseAuthException catch (e) {
-                                      Navigator.of(context).pop();
-                                      if (e.code == 'email-already-in-use') {
-                                        errorMessage =
-                                            'The account already exists for that email.';
-                                        Future.delayed(
-                                          const Duration(seconds: 5),
-                                          () {
-                                            errorMessage = "";
+                                        },
+                                        onTapUp: (details) async {
+                                          state(() {
+                                            selectConsent = false;
+                                            isLoadingConsent = true;
+                                          });
+                                          // GoRouter.of(context).pushNamed(
+                                          //     "webview",
+                                          //     pathParameters: {
+                                          //       'url': "google"
+                                          //     }).then((value) {
+                                          //   // GoRouter.of(context).pushNamed(
+                                          //   //     CFRouteNames.homeRouteName);
+                                          // });
+
+                                          try {
+                                            await FirebaseAuth.instance
+                                                .createUserWithEmailAndPassword(
+                                              email: emailController.text,
+                                              password: passwordController.text,
+                                            );
+                                            FirebaseAuth.instance.currentUser!
+                                                .updateDisplayName(
+                                                    nameController.text);
+                                            Map response =
+                                                await SetuAPI.createConsent(
+                                                    phoneController.text);
+                                            if (response.isNotEmpty) {
+                                              if (mounted) {
+                                                GoRouter.of(context).pushNamed(
+                                                    "webview",
+                                                    pathParameters: {
+                                                      'url': response['id']
+                                                    }).then((value) async {
+                                                  FirebaseAuth
+                                                      .instance.currentUser!
+                                                      .reload();
+                                                  if (ref
+                                                      .read(consentAcceptCheck
+                                                          .notifier)
+                                                      .state) {
+                                                    Map consentDetails =
+                                                        await SetuAPI
+                                                            .getConsent(
+                                                                response['id']);
+                                                    print(consentDetails);
+                                                    ref
+                                                            .read(userProvider
+                                                                .notifier)
+                                                            .state =
+                                                        CFUser.fromMap(
+                                                            {
+                                                          'consentID':
+                                                              response['id'],
+                                                          'hasConsented': true,
+                                                          'consentDetails':
+                                                              consentDetails
+                                                        },
+                                                            FirebaseAuth
+                                                                .instance
+                                                                .currentUser);
+                                                    FirebaseFirestore.instance
+                                                        .collection("users")
+                                                        .doc(ref
+                                                            .read(userProvider
+                                                                .notifier)
+                                                            .state!
+                                                            .uid)
+                                                        .set(ref
+                                                            .read(userProvider
+                                                                .notifier)
+                                                            .state!
+                                                            .toMap());
+                                                  } else {
+                                                    ref
+                                                            .read(userProvider
+                                                                .notifier)
+                                                            .state =
+                                                        CFUser.fromMap(
+                                                            {
+                                                          'consentID': '',
+                                                          'hasConsented': false,
+                                                          'consentDetails': {}
+                                                        },
+                                                            FirebaseAuth
+                                                                .instance
+                                                                .currentUser);
+                                                  }
+                                                  if (mounted) {
+                                                    GoRouter.of(context)
+                                                        .goNamed(CFRouteNames
+                                                            .homeRouteName);
+                                                  }
+                                                });
+                                              }
+                                            }
+                                          } on FirebaseAuthException catch (e) {
+                                            Navigator.of(context).pop();
+                                            if (e.code ==
+                                                'email-already-in-use') {
+                                              errorMessage =
+                                                  'The account already exists for that email.';
+                                              Future.delayed(
+                                                const Duration(seconds: 5),
+                                                () {
+                                                  errorMessage = "";
+                                                  setState(() {});
+                                                },
+                                              );
+                                            }
                                             setState(() {});
-                                          },
-                                        );
-                                      }
-                                      setState(() {});
-                                    }
-                                  },
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 100),
-                                    margin: const EdgeInsets.only(top: 40.0),
-                                    padding: const EdgeInsets.only(
-                                        top: 15.0,
-                                        bottom: 15.0,
-                                        left: 50.0,
-                                        right: 50.0),
-                                    decoration: ShapeDecoration(
-                                      color: const Color(0xFF3369FF),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(15.0),
+                                          }
+                                        },
+                                        child: AnimatedContainer(
+                                          duration:
+                                              const Duration(milliseconds: 100),
+                                          margin:
+                                              const EdgeInsets.only(top: 40.0),
+                                          padding: const EdgeInsets.only(
+                                              top: 15.0,
+                                              bottom: 15.0,
+                                              left: 50.0,
+                                              right: 50.0),
+                                          decoration: ShapeDecoration(
+                                            color: const Color(0xFF3369FF),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(15.0),
+                                            ),
+                                            shadows: [
+                                              !selectConsent
+                                                  ? const BoxShadow(
+                                                      offset: Offset(0, 4),
+                                                      color: Colors.black26,
+                                                      blurRadius: 10,
+                                                      spreadRadius: 1.0,
+                                                    )
+                                                  : const BoxShadow(
+                                                      offset: Offset(0, 0),
+                                                      spreadRadius: 2.0,
+                                                      blurRadius: 1.0,
+                                                      color: Colors.black12,
+                                                    ),
+                                            ],
+                                          ),
+                                          child: const Text(
+                                            "I Accept",
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                        ),
+                                      )
+                                    : Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 25.0),
+                                        child: LoadingAnimationWidget
+                                            .staggeredDotsWave(
+                                          color:
+                                              Color.fromARGB(255, 16, 64, 221),
+                                          size: 35.0,
+                                        ),
                                       ),
-                                      shadows: [
-                                        !selectConsent
-                                            ? const BoxShadow(
-                                                offset: Offset(0, 4),
-                                                color: Colors.black26,
-                                                blurRadius: 10,
-                                                spreadRadius: 1.0,
-                                              )
-                                            : const BoxShadow(
-                                                offset: Offset(0, 0),
-                                                spreadRadius: 2.0,
-                                                blurRadius: 1.0,
-                                                color: Colors.black12,
-                                              ),
-                                      ],
-                                    ),
-                                    child: const Text(
-                                      "I Accept",
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                                ),
                                 const SizedBox(height: 10.0),
                                 TextButton(
                                   onPressed: () {
@@ -533,7 +568,11 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                           );
                         });
                       },
-                    );
+                    ).then((value) {
+                      setState(() {
+                        isLoadingConsent = false;
+                      });
+                    });
                   }
                 },
                 child: Align(
