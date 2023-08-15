@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:CapitalFlowAI/components/cfconstants.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
@@ -16,8 +17,8 @@ class SetuAPI {
     http.Response response = await http.post(
       Uri.https('fiu-uat.setu.co', '/consents'),
       headers: {
-        'x-client-id': '95074533-43ae-4f7a-855c-ff1245d76936',
-        'x-client-secret': 'ba62d6f5-e9ba-4f18-8b0b-d60d959b9eb1',
+        'x-client-id': CFConstants.clientID,
+        'x-client-secret': CFConstants.clientSecret,
         'Content-Type': 'application/json'
       },
       body: json.encode({
@@ -61,8 +62,8 @@ class SetuAPI {
         'https://fiu-uat.setu.co/consents/$consentID',
       ),
       headers: {
-        'x-client-id': '95074533-43ae-4f7a-855c-ff1245d76936',
-        'x-client-secret': 'ba62d6f5-e9ba-4f18-8b0b-d60d959b9eb1',
+        'x-client-id': CFConstants.clientID,
+        'x-client-secret': CFConstants.clientSecret,
       },
     );
     Map<String, dynamic> finalResp = {};
@@ -74,16 +75,16 @@ class SetuAPI {
     return finalResp;
   }
 
-  static void createDataSesion(String consentID) async {
+  static Future<String> createDataSesion(String consentID) async {
     http.Response response = await http.post(
       Uri.https('fiu-uat.setu.co', '/sessions'),
       headers: {
-        'x-client-id': '95074533-43ae-4f7a-855c-ff1245d76936',
-        'x-client-secret': 'ba62d6f5-e9ba-4f18-8b0b-d60d959b9eb1',
+        'x-client-id': CFConstants.clientID,
+        'x-client-secret': CFConstants.clientSecret,
         'Content-Type': 'application/json'
       },
       body: json.encode({
-        "consentId": "33380102-87e2-411b-8633-6b59e93543b0",
+        "consentId": consentID,
         "DataRange": {
           "from": "2021-06-30T00:00:00.000Z",
           "to": "2023-06-30T00:00:00.000Z"
@@ -91,18 +92,25 @@ class SetuAPI {
         "format": "json"
       }),
     );
-    getData(json.decode(response.body)['id']);
+    print("create session: ${response.reasonPhrase}");
+    return json.decode(response.body)['id'];
   }
 
-  static void getData(String id) async {
-    "";
+  static Future<Map> getData(String id) async {
     http.Response response = await http.get(
-      Uri.https('fiu-uat.setu.co', '/sessions/$id'),
+      Uri.parse("https://fiu-uat.setu.co/sessions/$id"),
       headers: {
-        'x-client-id': '95074533-43ae-4f7a-855c-ff1245d76936',
-        'x-client-secret': 'ba62d6f5-e9ba-4f18-8b0b-d60d959b9eb1',
+        'x-client-id': CFConstants.clientID,
+        'x-client-secret': CFConstants.clientSecret,
       },
     );
-    print(json.decode(response.body));
+
+    print("get data: ${response.reasonPhrase}");
+    if (response.reasonPhrase == "OK") {
+      return json.decode(response.body);
+    } else if (response.reasonPhrase == "NOT FOUND") {
+      return {"error": 404};
+    }
+    return {"error": 500};
   }
 }

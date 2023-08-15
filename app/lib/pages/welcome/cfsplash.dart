@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:CapitalFlowAI/components/cfuser.dart';
 import 'package:CapitalFlowAI/routes/cfroute_names.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -32,10 +33,18 @@ class _CFSplashState extends ConsumerState<CFSplash> {
   }
 
   void checkLogin() async {
-    if (FirebaseAuth.instance.currentUser != null) {
+    User? tempUser = FirebaseAuth.instance.currentUser;
+    if (tempUser != null) {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(tempUser.uid)
+          .get();
+      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
       ref.read(userProvider.notifier).state =
-          CFUser.fromMap({}, FirebaseAuth.instance.currentUser);
-      GoRouter.of(context).pushReplacementNamed(CFRouteNames.homeRouteName);
+          CFUser.fromMap(data, FirebaseAuth.instance.currentUser);
+      if (mounted) {
+        GoRouter.of(context).pushReplacementNamed(CFRouteNames.homeRouteName);
+      }
     } else {
       SharedPreferences preferences = await SharedPreferences.getInstance();
       bool? isFirst = preferences.getBool("isFirst");

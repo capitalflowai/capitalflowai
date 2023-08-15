@@ -1,4 +1,4 @@
-import 'package:CapitalFlowAI/pages/cfsignup.dart';
+import 'package:CapitalFlowAI/pages/signup/cfsignup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';

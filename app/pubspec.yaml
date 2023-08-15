@@ -28,12 +28,12 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  animate_gradient: ^0.0.2+1
   chat_bubbles: ^1.4.1
   cloud_firestore: ^4.8.4
   cupertino_icons: ^1.0.2
   firebase_auth: ^4.7.2
   firebase_core: ^2.15.0
+  fl_chart: ^0.63.0
   flutter:
     sdk: flutter
   flutter_feather_icons: ^2.0.0+1
@@ -46,7 +46,6 @@ dependencies:
   intl: ^0.18.1
   loading_animation_widget: ^1.2.0+4
   shared_preferences: ^2.2.0
-  webview_flutter: ^4.2.2
 
 dev_dependencies:
   flutter_lints: ^2.0.0

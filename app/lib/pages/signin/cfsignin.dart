@@ -1,6 +1,7 @@
 import 'package:CapitalFlowAI/components/cfuser.dart';
-import 'package:CapitalFlowAI/pages/cfsplash.dart';
+import 'package:CapitalFlowAI/pages/welcome/cfsplash.dart';
 import 'package:CapitalFlowAI/routes/cfroute_names.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
@@ -189,13 +190,18 @@ class _CFSignInState extends ConsumerState<CFSignIn> {
                     });
                     if (_formKey.currentState!.validate()) {
                       try {
-                        UserCredential userCredTemp = await FirebaseAuth
+                        await FirebaseAuth.instance.signInWithEmailAndPassword(
+                            email: emailController.text,
+                            password: passwordController.text);
+                        DocumentSnapshot snapshot = await FirebaseFirestore
                             .instance
-                            .signInWithEmailAndPassword(
-                                email: emailController.text,
-                                password: passwordController.text);
+                            .collection("users")
+                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .get();
+                        Map<String, dynamic> data =
+                            snapshot.data() as Map<String, dynamic>;
                         ref.read(userProvider.notifier).state = CFUser.fromMap(
-                            {}, FirebaseAuth.instance.currentUser);
+                            data, FirebaseAuth.instance.currentUser);
                         if (mounted) {
                           GoRouter.of(context)
                               .goNamed(CFRouteNames.homeRouteName);

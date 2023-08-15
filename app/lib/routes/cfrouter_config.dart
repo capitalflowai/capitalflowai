@@ -1,11 +1,12 @@
-import 'package:CapitalFlowAI/pages/cfhome.dart';
-import 'package:CapitalFlowAI/pages/cfmidas.dart';
-import 'package:CapitalFlowAI/pages/cfsignin.dart';
-import 'package:CapitalFlowAI/pages/cfonboarding.dart';
-import 'package:CapitalFlowAI/pages/cfsignup.dart';
-import 'package:CapitalFlowAI/pages/cfsplash.dart';
-import 'package:CapitalFlowAI/pages/cfwebview.dart';
-import 'package:CapitalFlowAI/pages/cfwelcome.dart';
+import 'package:CapitalFlowAI/pages/home/cfhome.dart';
+import 'package:CapitalFlowAI/pages/home/cfmidas.dart';
+import 'package:CapitalFlowAI/pages/profile/cfprofile.dart';
+import 'package:CapitalFlowAI/pages/signin/cfsignin.dart';
+import 'package:CapitalFlowAI/pages/welcome/cfonboarding.dart';
+import 'package:CapitalFlowAI/pages/welcome/cfsplash.dart';
+import 'package:CapitalFlowAI/pages/welcome/cfwelcome.dart';
+import 'package:CapitalFlowAI/pages/signup/cfsignup.dart';
+import 'package:CapitalFlowAI/pages/signup/cfwebview.dart';
 import 'package:CapitalFlowAI/routes/cfroute_names.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -69,6 +70,11 @@ class CFRouter {
         name: CFRouteNames.midasRouteName,
         path: "/midas",
         builder: (context, state) => const CFMidas(),
+      ),
+      GoRoute(
+        name: CFRouteNames.profileRouteName,
+        path: "/profile",
+        builder: (context, state) => const CFProfile(),
       ),
     ],
   );

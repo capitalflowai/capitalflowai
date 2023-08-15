@@ -7,4 +7,5 @@ class CFRouteNames {
   static const String signInRouteName = "sign-in";
   static const String homeRouteName = "home";
   static const String midasRouteName = "midas";
+  static const String profileRouteName = "profile";
 }

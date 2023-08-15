@@ -1,106 +1,165 @@
+import 'dart:math';
 import 'package:CapitalFlowAI/components/cfconstants.dart';
-import 'package:animate_gradient/animate_gradient.dart';
+import 'package:CapitalFlowAI/pages/welcome/cfsplash.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CFBalance extends ConsumerStatefulWidget {
-  final double remainingPercentage;
-  final double spentPercentage;
-
-  const CFBalance(
-      {super.key,
-      required this.remainingPercentage,
-      required this.spentPercentage});
+  const CFBalance({
+    super.key,
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _CFBalanceState();
 }
 
 class _CFBalanceState extends ConsumerState<CFBalance> {
-  List<double> stops = [];
-
   @override
   void initState() {
     super.initState();
-    if (widget.remainingPercentage < widget.spentPercentage) {
-      stops = [widget.remainingPercentage, widget.spentPercentage];
-    } else if (widget.remainingPercentage > widget.spentPercentage) {
-      stops = [widget.spentPercentage, widget.remainingPercentage];
-    } else {
-      double data = calculateAverage(
-          [widget.remainingPercentage, widget.spentPercentage]);
-      print(data);
-    }
-  }
-
-  double calculateAverage(List<double> stops) {
-    return stops.reduce((sum, value) => sum + value) / stops.length;
   }
 
   @override
   Widget build(BuildContext context) {
-    print((widget.remainingPercentage - widget.spentPercentage).abs());
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      padding: const EdgeInsets.only(
-          top: 30.0, left: 20.0, right: 20.0, bottom: 30.0),
-      width: double.maxFinite,
-      height: 175,
+    return Container(
+      height: MediaQuery.of(context).size.height / 4.5,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: (widget.remainingPercentage - widget.spentPercentage).abs() <=
-                  0.15
-              ? [
-                  CFConstants.anotherColor,
-                  const Color.fromARGB(255, 225, 98, 79),
-                ]
-              : widget.remainingPercentage > widget.spentPercentage
-                  ? [
-                      CFConstants.remainingColor,
-                      CFConstants.balanceColor,
-                    ]
-                  : [
-                      CFConstants.balanceColor,
-                      CFConstants.remainingColor,
-                    ],
-          stops: (widget.remainingPercentage - widget.spentPercentage).abs() <=
-                  0.15
-              ? [0.3, 0.7]
-              : widget.remainingPercentage <= widget.spentPercentage
-                  ? [widget.remainingPercentage, widget.spentPercentage]
-                  : [widget.spentPercentage, widget.remainingPercentage],
-        ),
+        borderRadius: BorderRadius.circular(10.0),
+        gradient: const RadialGradient(
+            colors: [CFConstants.cardBlue, CFConstants.cardwhite],
+            radius: 1.0,
+            center: Alignment.topRight,
+            stops: [0.2, 1]),
         boxShadow: const [
           BoxShadow(
-            offset: Offset(0, 0),
-            spreadRadius: 1.0,
-            blurRadius: 20.5,
-            color: Colors.grey,
+            spreadRadius: 4.0,
+            blurRadius: 15.0,
+            color: Colors.black26,
           ),
         ],
-        borderRadius: BorderRadius.circular(10.0),
       ),
-      child: const Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+      child: Stack(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Monthly Budget"),
-              Text("5000"),
-            ],
+          //squiggly line
+          Positioned(
+            top: 75,
+            right: 60,
+            child: SizedBox(
+              height: 200,
+              width: 300,
+              child: CustomPaint(
+                painter: CustomSineCurvePainter(
+                  amplitude: 40,
+                  frequency: 3.0,
+                  phase: 9,
+                  angle: pi / 8,
+                ),
+              ),
+            ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Money Spent So Far"),
-              Text("5000"),
-            ],
+          //total budget text
+          const Positioned(
+            top: 35,
+            left: 10,
+            child: Text(
+              'Total Budget',
+              style: TextStyle(
+                fontSize: 20,
+                color: Colors.black,
+              ),
+            ),
+          ),
+          //budget money value
+          Positioned(
+            top: 65,
+            left: 10,
+            child: Text(
+              "Rs. ${ref.read(userProvider.notifier).state!.monthlyBudget.toInt().toString()}",
+              style: const TextStyle(
+                  fontSize: 17.5,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w300),
+            ),
+          ),
+          //money spent text
+          const Padding(
+            padding: EdgeInsets.only(bottom: 35.0, right: 45.0),
+            child: Align(
+              alignment: Alignment.bottomRight,
+              child: Text(
+                'Money Spent',
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ),
+          //money spent value
+          const Padding(
+            padding: EdgeInsets.only(bottom: 10.0, right: 45.0),
+            child: Align(
+              alignment: Alignment.bottomRight,
+              child: Text(
+                "Rs. fix this",
+                style: TextStyle(
+                    fontSize: 17.5,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w300),
+              ),
+            ),
           ),
         ],
       ),
     );
+  }
+}
+
+class CustomSineCurvePainter extends CustomPainter {
+  final double amplitude;
+  final double frequency;
+  final double phase;
+  final double angle;
+
+  CustomSineCurvePainter({
+    required this.amplitude,
+    required this.frequency,
+    required this.phase,
+    required this.angle,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final double width = size.width;
+    final double height = size.height;
+
+    final path = Path();
+
+    final startX = width / 5;
+
+    for (double x = startX; x <= width * 1.2; x += 1) {
+      final y =
+          amplitude * sin(((x + startX) / width * frequency * 2 * pi) + phase) +
+              -height / 1.5;
+      final rotatedX = x * cos(angle) - y * sin(angle);
+      final rotatedY = x * sin(angle) + y * cos(angle);
+      if (x == startX) {
+        path.moveTo(rotatedX, rotatedY);
+      } else {
+        path.lineTo(rotatedX, rotatedY);
+      }
+    }
+
+    final strokePaint = Paint()
+      ..color = Colors.black.withOpacity(0.6)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0;
+
+    canvas.drawPath(path, strokePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
   }
 }

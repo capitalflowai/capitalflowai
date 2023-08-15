@@ -1,6 +1,8 @@
 import 'package:CapitalFlowAI/backend/cfsetu.dart';
+import 'package:CapitalFlowAI/components/cfavatar.dart';
+import 'package:CapitalFlowAI/components/cfconstants.dart';
 import 'package:CapitalFlowAI/components/cfuser.dart';
-import 'package:CapitalFlowAI/pages/cfsplash.dart';
+import 'package:CapitalFlowAI/pages/welcome/cfsplash.dart';
 import 'package:CapitalFlowAI/routes/cfroute_names.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -24,8 +26,11 @@ class CFSignUp extends ConsumerStatefulWidget {
 }
 
 class _CFSignUpState extends ConsumerState<CFSignUp> {
+  int selectedAvatar = -1;
+  bool showAvatarError = false;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
+  ScrollController controller = ScrollController();
   bool selectSign = false;
   bool selectConsent = false;
   String errorMessage = "";
@@ -35,6 +40,7 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
   bool passwordError2 = true;
   bool passwordError3 = true;
   bool isLoadingConsent = false;
+
   TextEditingController phoneController = TextEditingController();
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -62,6 +68,7 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
       body: SafeArea(
         child: Center(
           child: ListView(
+            controller: controller,
             padding: const EdgeInsets.only(
                 top: 30.0, left: 65.0, right: 65.0, bottom: 30.0),
             shrinkWrap: true,
@@ -72,7 +79,51 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                   fontSize: 37,
                 ),
               ),
-              const SizedBox(height: 50),
+              const SizedBox(height: 35),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedAvatar = 0;
+                        showAvatarError = false;
+                      });
+                    },
+                    child: CFAvatar(
+                      name: "assets/maleAvatar.png",
+                      width: 75,
+                      color: CFConstants.maleColor,
+                      isSelected: selectedAvatar == 0
+                          ? 1
+                          : showAvatarError
+                              ? -1
+                              : 0,
+                      isBorder: true,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedAvatar = 1;
+                        showAvatarError = false;
+                      });
+                    },
+                    child: CFAvatar(
+                      name: "assets/femaleAvatar.png",
+                      width: 75,
+                      color: CFConstants.femaleColor,
+                      isSelected: selectedAvatar == 1
+                          ? 1
+                          : showAvatarError
+                              ? -1
+                              : 0,
+                      isBorder: true,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 50.0),
               Form(
                 key: _formKey,
                 child: Column(
@@ -346,7 +397,6 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                 duration: const Duration(milliseconds: 300),
               ),
               //sign up button
-
               GestureDetector(
                 onTapDown: (details) {
                   setState(() {
@@ -358,7 +408,8 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                     selectSign = false;
                   });
                   if (_formKey.currentState!.validate() &&
-                      (!passwordError1 && !passwordError2 && !passwordError3)) {
+                      (!passwordError1 && !passwordError2 && !passwordError3) &&
+                      selectedAvatar != -1) {
                     showModalBottomSheet(
                       context: _scaffoldKey.currentContext!,
                       builder: (context2) {
@@ -439,7 +490,10 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                                                         await SetuAPI
                                                             .getConsent(
                                                                 response['id']);
-                                                    print(consentDetails);
+                                                    String sessionID =
+                                                        await SetuAPI
+                                                            .createDataSesion(
+                                                                response['id']);
                                                     ref
                                                             .read(userProvider
                                                                 .notifier)
@@ -449,8 +503,17 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                                                           'consentID':
                                                               response['id'],
                                                           'hasConsented': true,
+                                                          'sessionID':
+                                                              sessionID,
                                                           'consentDetails':
-                                                              consentDetails
+                                                              consentDetails,
+                                                          'eomBalance': 0.0,
+                                                          'monthlyBudget': 0.0,
+                                                          'avatar':
+                                                              selectedAvatar ==
+                                                                      0
+                                                                  ? "maleAvatar"
+                                                                  : 'femaleAvatar'
                                                         },
                                                             FirebaseAuth
                                                                 .instance
@@ -476,12 +539,20 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                                                             {
                                                           'consentID': '',
                                                           'hasConsented': false,
-                                                          'consentDetails': {}
+                                                          'consentDetails': {},
+                                                          'eomBalance': 0.0,
+                                                          'monthlyBudget': 0.0,
+                                                          'avatar':
+                                                              selectedAvatar ==
+                                                                      0
+                                                                  ? "maleAvatar"
+                                                                  : 'femaleAvatar'
                                                         },
                                                             FirebaseAuth
                                                                 .instance
                                                                 .currentUser);
                                                   }
+
                                                   if (mounted) {
                                                     GoRouter.of(context)
                                                         .goNamed(CFRouteNames
@@ -551,8 +622,8 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                                             const EdgeInsets.only(top: 25.0),
                                         child: LoadingAnimationWidget
                                             .staggeredDotsWave(
-                                          color:
-                                              Color.fromARGB(255, 16, 64, 221),
+                                          color: const Color.fromARGB(
+                                              255, 16, 64, 221),
                                           size: 35.0,
                                         ),
                                       ),
@@ -572,6 +643,10 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                       setState(() {
                         isLoadingConsent = false;
                       });
+                    });
+                  } else if (selectedAvatar == -1) {
+                    setState(() {
+                      showAvatarError = true;
                     });
                   }
                 },
