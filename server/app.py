@@ -32,7 +32,7 @@ def monthly_budget_slider():
             transactions = data['Payload'][0]['data'][0]['decryptedFI']['account']['transactions']['transaction']
             
         # Filter transactions for the current month
-        current_month_transactions = [transaction for transaction in transactions if int(transaction['transactionTimestamp'][:10].split('-')[1]) == current_month]
+        current_month_transactions = [transaction for transaction in transactions if float(transaction['transactionTimestamp'][:10].split('-')[1]) == current_month]
         
         # Calculate the percentage spent
         percentage_spent = calculate_percentage_spent(current_month_transactions, budget)
