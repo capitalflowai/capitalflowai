@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:CapitalFlowAI/components/cfconstants.dart';
 import 'package:CapitalFlowAI/components/cfquestion.dart';
 import 'package:CapitalFlowAI/components/cfusermessage.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +8,7 @@ import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 
 class CFMidas extends StatefulWidget {
   const CFMidas({super.key});
@@ -15,19 +19,43 @@ class CFMidas extends StatefulWidget {
 
 class _CFMidasState extends State<CFMidas> {
   String query = "";
+  ScrollController scrollController = ScrollController();
   TextEditingController messageController = TextEditingController();
+  bool canScroll = false;
   List<List> messages = [];
   @override
   void initState() {
     super.initState();
-    Future.delayed(
-      const Duration(milliseconds: 300),
-      () {},
-    );
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      scrollController.addListener(() {
+        if (!scrollController.position.atEdge) {
+          canScroll = true;
+        } else {
+          if (scrollController.position.pixels != 0) {
+            canScroll = false;
+          }
+        }
+        setState(() {});
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    scrollController.dispose();
+    messageController.dispose();
   }
 
   void sendQuery() async {
-    print("$query query sent!");
+    http.Response response = await http.post(
+      Uri.http(CFConstants.cfServerURL, "/midasai"),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'message': "what"}),
+    );
+    setState(() {
+      messages.add([json.decode(response.body)['message'], false]);
+    });
   }
 
   @override
@@ -114,20 +142,56 @@ class _CFMidasState extends State<CFMidas> {
                           ),
                         ],
                       )
-                    : ListView.builder(
-                        padding: const EdgeInsets.only(top: 20.0),
-                        shrinkWrap: true,
-                        itemCount: messages.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 15.0),
-                            child: CFUserMessage(
-                                message: messages[index][0],
-                                isSender: messages[index][1]),
-                          );
-                        },
+                    : Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 100),
+                          child: ListView.builder(
+                            controller: scrollController,
+                            shrinkWrap: true,
+                            reverse: true,
+                            itemCount: messages.length,
+                            itemBuilder: (context, index) {
+                              final reversedIndex = messages.length - 1 - index;
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 15.0),
+                                child: CFUserMessage(
+                                    message: messages[reversedIndex][0],
+                                    isSender: messages[reversedIndex][1]),
+                              );
+                            },
+                          ),
+                        ),
                       ),
               ],
+            ),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 50),
+                child: canScroll
+                    ? Padding(
+                        padding: EdgeInsets.only(
+                          left: 25.0,
+                          right: 25.0,
+                          bottom:
+                              MediaQuery.of(context).viewInsets.bottom + 100.0,
+                        ),
+                        child: FloatingActionButton(
+                          elevation: 15,
+                          mini: true,
+                          shape: const CircleBorder(),
+                          backgroundColor: Color.fromARGB(255, 199, 208, 255),
+                          onPressed: () {
+                            scrollController.animateTo(
+                                scrollController.position.maxScrollExtent,
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.decelerate);
+                          },
+                          child: const Icon(FeatherIcons.chevronDown),
+                        ),
+                      )
+                    : Container(),
+              ),
             ),
             Align(
               alignment: Alignment.bottomCenter,
@@ -140,7 +204,7 @@ class _CFMidasState extends State<CFMidas> {
                 padding:
                     const EdgeInsets.only(bottom: 5.0, left: 20.0, right: 10.0),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(100.0),
+                  borderRadius: BorderRadius.circular(10.0),
                   color: Colors.white,
                   boxShadow: const [
                     BoxShadow(
@@ -153,6 +217,11 @@ class _CFMidasState extends State<CFMidas> {
                 ),
                 child: TextField(
                   controller: messageController,
+                  maxLines: null,
+                  onSubmitted: (value) {
+                    FocusScope.of(context).unfocus();
+                  },
+                  textInputAction: TextInputAction.go,
                   decoration: InputDecoration(
                     contentPadding: const EdgeInsets.only(top: 12.5),
                     isDense: true,

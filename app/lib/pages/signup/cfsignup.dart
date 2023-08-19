@@ -539,7 +539,9 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                                                             {
                                                           'consentID': '',
                                                           'hasConsented': false,
-                                                          'consentDetails': {},
+                                                          'consentDetails': Map<
+                                                              String,
+                                                              dynamic>.from({}),
                                                           'eomBalance': 0.0,
                                                           'monthlyBudget': 0.0,
                                                           'avatar':

@@ -62,7 +62,7 @@ class _CFSetTargetsState extends ConsumerState<CFSetTargets> {
                         validator: (value) {
                           if (value!.isEmpty ||
                               double.parse(value) < 1.0 ||
-                              double.parse(value) >
+                              double.parse(value) <
                                   double.parse(monthlyBudgetController.text)) {
                             return "Please check entered balance";
                           }
@@ -116,7 +116,7 @@ class _CFSetTargetsState extends ConsumerState<CFSetTargets> {
                         validator: (value) {
                           if (value!.isEmpty ||
                               double.parse(value) < 1.0 ||
-                              double.parse(value) <
+                              double.parse(value) >
                                   double.parse(eomBalanceController.text)) {
                             return "Please check entered budget";
                           }

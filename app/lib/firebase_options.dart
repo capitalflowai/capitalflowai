@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCwbr9zjgin4RnBdls34BAqfqrFmHWgTUM',
-    appId: '1:640702612599:android:0edb88c17d960967cf7272',
+    appId: '1:640702612599:android:465e569ba9f32f4ecf7272',
     messagingSenderId: '640702612599',
     projectId: 'capitalflowai-62f4a',
     storageBucket: 'capitalflowai-62f4a.appspot.com',
@@ -59,12 +59,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyCmuzTTslswqTZ9DuP7VDMBO6UqG_uIya0',
-    appId: '1:640702612599:ios:cd6edaad9a0ddb41cf7272',
+    appId: '1:640702612599:ios:2f1b2d11996b77cdcf7272',
     messagingSenderId: '640702612599',
     projectId: 'capitalflowai-62f4a',
     storageBucket: 'capitalflowai-62f4a.appspot.com',
-    iosClientId:
-        '640702612599-udob7bk1onc3jd3bd7lf7n1nalogh5ur.apps.googleusercontent.com',
-    iosBundleId: 'com.capitalflowai',
+    iosClientId: '640702612599-h929leaqbpv3uqd51qterqiht0jvgj63.apps.googleusercontent.com',
+    iosBundleId: 'com.capitalflow.cf',
   );
 }

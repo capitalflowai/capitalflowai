@@ -10,10 +10,13 @@ class CFUserMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BubbleNormal(
-      color: const Color.fromARGB(255, 51, 105, 255),
+      color: isSender
+          ? const Color.fromARGB(255, 51, 105, 255)
+          : Color.fromARGB(255, 213, 244, 255),
       text: message,
       isSender: isSender,
-      textStyle: const TextStyle(color: Colors.white, fontSize: 15.5),
+      textStyle: TextStyle(
+          color: isSender ? Colors.white : Colors.black, fontSize: 15.5),
     );
   }
 }

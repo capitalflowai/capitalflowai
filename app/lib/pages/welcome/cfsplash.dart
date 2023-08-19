@@ -34,16 +34,23 @@ class _CFSplashState extends ConsumerState<CFSplash> {
 
   void checkLogin() async {
     User? tempUser = FirebaseAuth.instance.currentUser;
+
     if (tempUser != null) {
-      DocumentSnapshot snapshot = await FirebaseFirestore.instance
-          .collection("users")
-          .doc(tempUser.uid)
-          .get();
-      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-      ref.read(userProvider.notifier).state =
-          CFUser.fromMap(data, FirebaseAuth.instance.currentUser);
-      if (mounted) {
-        GoRouter.of(context).pushReplacementNamed(CFRouteNames.homeRouteName);
+      DocumentReference reference =
+          FirebaseFirestore.instance.collection("users").doc(tempUser.uid);
+      DocumentSnapshot snapshot = await reference.get();
+      if (snapshot.exists) {
+        Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+        ref.read(userProvider.notifier).state =
+            CFUser.fromMap(data, FirebaseAuth.instance.currentUser);
+        if (mounted) {
+          GoRouter.of(context).pushReplacementNamed(CFRouteNames.homeRouteName);
+        }
+      } else {
+        if (mounted) {
+          GoRouter.of(context)
+              .pushReplacementNamed(CFRouteNames.welcomeRouteName);
+        }
       }
     } else {
       SharedPreferences preferences = await SharedPreferences.getInstance();

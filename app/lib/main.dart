@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:CapitalFlowAI/routes/cfrouter_config.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
@@ -17,6 +20,8 @@ void main() async {
       statusBarIconBrightness: Brightness.dark,
     ),
   );
+  FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
   runApp(const ProviderScope(child: MyApp()));
 }
 
