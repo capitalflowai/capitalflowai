@@ -29,9 +29,12 @@ def mode_pie_chart():
         current_month = datetime.datetime.now().month
         
         # Fetch transaction data from your local JSON file
-        with open('others/dataFetch-long.json', 'r') as data_file:
-            data = json.load(data_file)
-            transactions = data['Payload'][0]['data'][0]['decryptedFI']['account']['transactions']['transaction']
+       
+        request_data = request.json
+
+        #Retrieve budget from the json file
+        transactions = request_data['Payload'][0]['data'][0]['decryptedFI']['account']['transactions']['transaction']
+
             
         # Filter transactions for the current month
         current_month_transactions = [transaction for transaction in transactions if int(transaction['transactionTimestamp'][:10].split('-')[1]) == current_month]
