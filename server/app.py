@@ -8,6 +8,55 @@ app = Flask(__name__)
 
 def process_message(message):
     return {"message": message.upper()}
+#For 5 days monthly expense
+def calculate_expenses_by_frequency(transactions, frequency_days):
+    expenses_by_frequency = {}
+    
+    for transaction in transactions:
+        transaction_date = datetime.datetime.strptime(transaction['transactionTimestamp'][:10], '%Y-%m-%d')
+        key = (transaction_date.day // frequency_days) + 1
+        
+        if key not in expenses_by_frequency:
+            expenses_by_frequency[key] = 0
+        
+        if transaction['type'] == 'DEBIT':
+            expenses_by_frequency[key] += float(transaction['amount'])
+    
+    return sorted(expenses_by_frequency.items())
+
+def format_date(day, month):
+    return f"{day}/{month}"
+
+#The decorater for it 
+@app.route("/ExpensesByFrequency", methods=["GET"])
+def expenses_by_frequency():
+    try:
+       
+       
+        request_data = request.json
+
+        #Retrieve transactions from the json file
+        transactions = request_data['Payload'][0]['data'][0]['decryptedFI']['account']['transactions']['transaction']
+        # Get the current month and year
+        
+        current_month = datetime.datetime.now().month
+        current_year = datetime.datetime.now().year
+        
+        # Filter transactions for the current month and year
+        current_month_transactions = [transaction for transaction in transactions if
+                                      int(transaction['transactionTimestamp'][:4]) == current_year and
+                                      int(transaction['transactionTimestamp'][5:7]) == current_month]
+        
+        frequency_days = 5
+        expenses = calculate_expenses_by_frequency(current_month_transactions, frequency_days)
+        
+        response_data = [{'period': format_date(1 + (period - 1) * frequency_days, current_month), 'total_expenses': total_expenses} for period, total_expenses in expenses]
+        
+        return jsonify(response_data), 200
+        
+    except ValueError:
+        return "Invalid input or JSON data. Please make sure the data is correct.", 400
+
 
 #For Budget Slider purple thingy
 def calculate_percentage_spent(transactions, budget):
@@ -32,7 +81,7 @@ def mode_pie_chart():
        
         request_data = request.json
 
-        #Retrieve budget from the json file
+        #Retrieve transactions from the json file
         transactions = request_data['Payload'][0]['data'][0]['decryptedFI']['account']['transactions']['transaction']
 
             
