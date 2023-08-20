@@ -12,7 +12,7 @@ class CFUserMessage extends StatelessWidget {
     return BubbleNormal(
       color: isSender
           ? const Color.fromARGB(255, 51, 105, 255)
-          : Color.fromARGB(255, 213, 244, 255),
+          : const Color.fromARGB(255, 213, 244, 255),
       text: message,
       isSender: isSender,
       textStyle: TextStyle(

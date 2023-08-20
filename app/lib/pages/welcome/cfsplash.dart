@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:CapitalFlowAI/backend/cfserver.dart';
 import 'package:CapitalFlowAI/components/cfuser.dart';
 import 'package:CapitalFlowAI/routes/cfroute_names.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -43,6 +44,21 @@ class _CFSplashState extends ConsumerState<CFSplash> {
         Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
         ref.read(userProvider.notifier).state =
             CFUser.fromMap(data, FirebaseAuth.instance.currentUser);
+        DocumentSnapshot documentSnapshot = await reference
+            .collection('data')
+            .doc(ref.read(userProvider.notifier).state!.sessionID)
+            .get();
+        if (documentSnapshot.exists) {
+          ref.read(userProvider.notifier).state!.transactions =
+              documentSnapshot.data() as Map<String, dynamic>;
+          Map<String, dynamic> sliderData =
+              ref.read(userProvider.notifier).state!.transactions;
+          sliderData['budget'] =
+              ref.read(userProvider.notifier).state!.monthlyBudget;
+          ref.read(userProvider.notifier).state!.spentRatio =
+              await CFServer.sliderGraph(sliderData);
+        }
+
         if (mounted) {
           GoRouter.of(context).pushReplacementNamed(CFRouteNames.homeRouteName);
         }

@@ -92,11 +92,10 @@ class SetuAPI {
         "format": "json"
       }),
     );
-    print("create session: ${response.reasonPhrase}");
     return json.decode(response.body)['id'];
   }
 
-  static Future<Map> getData(String id) async {
+  static Future<Map<String, dynamic>> getData(String id) async {
     http.Response response = await http.get(
       Uri.parse("https://fiu-uat.setu.co/sessions/$id"),
       headers: {
@@ -105,7 +104,6 @@ class SetuAPI {
       },
     );
 
-    print("get data: ${response.reasonPhrase}");
     if (response.reasonPhrase == "OK") {
       return json.decode(response.body);
     } else if (response.reasonPhrase == "NOT FOUND") {

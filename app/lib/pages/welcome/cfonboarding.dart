@@ -61,8 +61,10 @@ class _CFOnboardingState extends State<CFOnboarding> {
                             ? 5
                             : 0,
                     decoration: BoxDecoration(
-                        color:
-                            index == 0 ? Colors.purple : Colors.purple.shade300,
+                        color: index == 0
+                            ? const Color.fromARGB(255, 51, 105, 255)
+                            : const Color.fromARGB(255, 51, 105, 255)
+                                .withOpacity(0.6),
                         borderRadius: BorderRadius.circular(12.0)),
                   ),
                   const SizedBox(
@@ -81,8 +83,10 @@ class _CFOnboardingState extends State<CFOnboarding> {
                             ? 5
                             : 0,
                     decoration: BoxDecoration(
-                        color:
-                            index == 1 ? Colors.purple : Colors.purple.shade300,
+                        color: index == 1
+                            ? const Color.fromARGB(255, 51, 105, 255)
+                            : const Color.fromARGB(255, 51, 105, 255)
+                                .withOpacity(0.6),
                         borderRadius: BorderRadius.circular(12.0)),
                   ),
                   const SizedBox(
@@ -110,8 +114,10 @@ class _CFOnboardingState extends State<CFOnboarding> {
                       width: index == 2 ? 50 : 5,
                       height: index == 2 ? 50 : 5,
                       decoration: BoxDecoration(
-                        color:
-                            index == 2 ? Colors.purple : Colors.purple.shade300,
+                        color: index == 2
+                            ? const Color.fromARGB(255, 51, 105, 255)
+                            : const Color.fromARGB(255, 51, 105, 255)
+                                .withOpacity(0.6),
                         borderRadius:
                             BorderRadius.circular(index == 2 ? 100.0 : 12.0),
                         boxShadow: index == 2

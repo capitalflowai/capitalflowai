@@ -89,9 +89,7 @@ class _CFProfileState extends ConsumerState<CFProfile> {
               ),
             ),
             GestureDetector(
-              onTap: () {
-                print("name");
-              },
+              onTap: () {},
               child: ListTile(
                 title: const Text(
                   "Name",

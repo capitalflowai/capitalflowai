@@ -5,9 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CFBalance extends ConsumerStatefulWidget {
-  const CFBalance({
-    super.key,
-  });
+  final double spentPercentage;
+  const CFBalance({super.key, required this.spentPercentage});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _CFBalanceState();
@@ -24,7 +23,7 @@ class _CFBalanceState extends ConsumerState<CFBalance> {
     return Container(
       height: MediaQuery.of(context).size.height / 4.5,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.0),
+        borderRadius: BorderRadius.circular(15.0),
         gradient: const RadialGradient(
             colors: [CFConstants.cardBlue, CFConstants.cardwhite],
             radius: 1.0,
@@ -60,22 +59,23 @@ class _CFBalanceState extends ConsumerState<CFBalance> {
           //total budget text
           const Positioned(
             top: 35,
-            left: 10,
+            left: 20,
             child: Text(
-              'Total Budget',
+              'Federal Bank',
               style: TextStyle(
                 fontSize: 20,
+                fontWeight: FontWeight.w400,
                 color: Colors.black,
               ),
             ),
           ),
           //budget money value
-          Positioned(
+          const Positioned(
             top: 65,
-            left: 10,
+            left: 20,
             child: Text(
-              "Rs. ${ref.read(userProvider.notifier).state!.monthlyBudget.toInt().toString()}",
-              style: const TextStyle(
+              "Debit",
+              style: TextStyle(
                   fontSize: 17.5,
                   color: Colors.black,
                   fontWeight: FontWeight.w300),
@@ -87,7 +87,7 @@ class _CFBalanceState extends ConsumerState<CFBalance> {
             child: Align(
               alignment: Alignment.bottomRight,
               child: Text(
-                'Money Spent',
+                'Account Balance',
                 style: TextStyle(
                   fontSize: 20,
                   color: Colors.black,
@@ -96,13 +96,13 @@ class _CFBalanceState extends ConsumerState<CFBalance> {
             ),
           ),
           //money spent value
-          const Padding(
-            padding: EdgeInsets.only(bottom: 10.0, right: 45.0),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10.0, right: 45.0),
             child: Align(
               alignment: Alignment.bottomRight,
               child: Text(
-                "Rs. fix this",
-                style: TextStyle(
+                "Rs. ${ref.read(userProvider.notifier).state!.transactions['Payload'][0]['data'][0]['decryptedFI']['account']['summary']['currentBalance']}",
+                style: const TextStyle(
                     fontSize: 17.5,
                     color: Colors.black,
                     fontWeight: FontWeight.w300),

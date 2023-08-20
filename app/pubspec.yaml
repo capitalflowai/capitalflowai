@@ -28,6 +28,7 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  blur: ^3.1.0
   chat_bubbles: ^1.4.1
   cloud_firestore: ^4.8.4
   cupertino_icons: ^1.0.2

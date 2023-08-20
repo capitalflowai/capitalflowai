@@ -8,9 +8,12 @@ class CFUser {
   String sessionID = "";
   double eomBalance = 0.0;
   double monthlyBudget = 0.0;
+  double spentRatio = 0.0;
   bool hasConsented = false;
   String avatar = "";
   Map<String, dynamic> consentDetails = {};
+  Map<String, dynamic> transactions = {};
+
   CFUser({
     required this.name,
     required this.email,
@@ -21,7 +24,9 @@ class CFUser {
     required this.sessionID,
     required this.eomBalance,
     required this.monthlyBudget,
+    required this.spentRatio,
     required this.avatar,
+    required this.transactions,
   });
 
   CFUser.fromMap(Map<String, dynamic> initialMap, User? tempUser)
@@ -32,9 +37,11 @@ class CFUser {
         sessionID = initialMap['sessionID'] ?? '',
         eomBalance = initialMap['eomBalance'] ?? 0.0,
         monthlyBudget = initialMap['monthlyBudget'] ?? 0.0,
+        spentRatio = initialMap['spentRatio'] ?? 0.0,
         hasConsented = initialMap['hasConsented'] ?? false,
         avatar = initialMap['avatar'] ?? "",
-        consentDetails = initialMap['consentDetails'] ?? {};
+        consentDetails = initialMap['consentDetails'] ?? {},
+        transactions = initialMap['transactions'] ?? {};
 
   Map<String, dynamic> toMap() {
     return {
@@ -48,6 +55,7 @@ class CFUser {
       'avatar': avatar,
       'hasConsented': hasConsented,
       'consentDetails': consentDetails,
+      'spentRatio': spentRatio,
     };
   }
 }

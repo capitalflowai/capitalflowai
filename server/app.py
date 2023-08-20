@@ -11,7 +11,8 @@ def process_message(message):
 
 
 def calculate_percentage_spent(transactions, budget):
-    total_spent = sum(transaction['amount'] for transaction in transactions if transaction['type'] == 'DEBIT')
+    print(transactions)
+    total_spent = sum(float(transaction['amount']) for transaction in transactions if transaction['type'] == 'DEBIT')
     percentage_spent = (total_spent / budget) * 100
     return percentage_spent
 
@@ -21,28 +22,26 @@ def monthly_budget_slider():
     try:
         # Get the monthly budget from the POST request data
         request_data = request.json
-        budget = float(request_data.get('budget', 0))  # Replace 0 with a default value
-        
+
+        #Retrieve budget from the json file
+        budget = float(request_data['budget'])
+
         # Get the current month using the datetime module
         current_month = datetime.datetime.now().month
-        
-        # Fetch transaction data from your local JSON file
-        with open('others/dataFetch.json', 'r') as data_file:
-            data = json.load(data_file)
-            transactions = data['Payload'][0]['data'][0]['decryptedFI']['account']['transactions']['transaction']
-            
+        transactions = request_data['Payload'][0]['data'][0]['decryptedFI']['account']['transactions']['transaction']
+
         # Filter transactions for the current month
         current_month_transactions = [transaction for transaction in transactions if float(transaction['transactionTimestamp'][:10].split('-')[1]) == current_month]
-        
+
         # Calculate the percentage spent
         percentage_spent = calculate_percentage_spent(current_month_transactions, budget)
-        
+
         # Post the calculated percentage back to the client as JSON response
         response_data = {'percentage': percentage_spent}
         return jsonify(response_data), 200
-        
-    except ValueError:
-        return "Invalid input. Please enter valid numerical values.", 400
+
+    except:
+        return "Check request data.", 400
 
 
 @app.route("/midasai", methods=["POST"])
@@ -57,4 +56,4 @@ def process():
 
 
 if __name__ == "__main__":
-    app.run(host="localhost", port=8000)
+    app.run()

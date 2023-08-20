@@ -1,4 +1,5 @@
 import 'package:CapitalFlowAI/pages/welcome/cfsplash.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -171,7 +172,16 @@ class _CFSetTargetsState extends ConsumerState<CFSetTargets> {
                                         .state!
                                         .monthlyBudget =
                                     double.parse(monthlyBudgetController.text);
-
+                                FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(ref
+                                        .read(userProvider.notifier)
+                                        .state!
+                                        .uid)
+                                    .set(ref
+                                        .read(userProvider.notifier)
+                                        .state!
+                                        .toMap());
                                 Navigator.of(context).pop();
                               }
                             },

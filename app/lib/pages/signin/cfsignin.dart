@@ -193,15 +193,29 @@ class _CFSignInState extends ConsumerState<CFSignIn> {
                         await FirebaseAuth.instance.signInWithEmailAndPassword(
                             email: emailController.text,
                             password: passwordController.text);
-                        DocumentSnapshot snapshot = await FirebaseFirestore
+
+                        DocumentReference documentReference = FirebaseFirestore
                             .instance
                             .collection("users")
-                            .doc(FirebaseAuth.instance.currentUser!.uid)
-                            .get();
+                            .doc(FirebaseAuth.instance.currentUser!.uid);
+                        DocumentSnapshot snapshot =
+                            await documentReference.get();
                         Map<String, dynamic> data =
                             snapshot.data() as Map<String, dynamic>;
                         ref.read(userProvider.notifier).state = CFUser.fromMap(
                             data, FirebaseAuth.instance.currentUser);
+                        DocumentSnapshot documentSnapshot =
+                            await documentReference
+                                .collection('data')
+                                .doc(ref
+                                    .read(userProvider.notifier)
+                                    .state!
+                                    .sessionID)
+                                .get();
+                        if (documentSnapshot.exists) {
+                          ref.read(userProvider.notifier).state!.transactions =
+                              documentSnapshot.data() as Map<String, dynamic>;
+                        }
                         if (mounted) {
                           GoRouter.of(context)
                               .goNamed(CFRouteNames.homeRouteName);

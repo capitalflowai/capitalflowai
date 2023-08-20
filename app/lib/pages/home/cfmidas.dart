@@ -180,7 +180,8 @@ class _CFMidasState extends State<CFMidas> {
                           elevation: 15,
                           mini: true,
                           shape: const CircleBorder(),
-                          backgroundColor: Color.fromARGB(255, 199, 208, 255),
+                          backgroundColor:
+                              const Color.fromARGB(255, 199, 208, 255),
                           onPressed: () {
                             scrollController.animateTo(
                                 scrollController.position.maxScrollExtent,

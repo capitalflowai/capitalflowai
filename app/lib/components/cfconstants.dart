@@ -7,5 +7,5 @@ class CFConstants {
   static const Color cardwhite = Color.fromARGB(255, 255, 255, 255);
   static const String clientID = '3503cca4-d421-468f-b09b-df99f4d22235';
   static const String clientSecret = '53f36a85-9005-4878-a994-c5b74856c7ee';
-  static const String cfServerURL = "sanjaibalajee.pythonanywhere.com";
+  static const String cfServerURL = "capitalflowai.pythonanywhere.com";
 }

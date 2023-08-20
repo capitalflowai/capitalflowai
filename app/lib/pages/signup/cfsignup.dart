@@ -461,14 +461,6 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                                           // });
 
                                           try {
-                                            await FirebaseAuth.instance
-                                                .createUserWithEmailAndPassword(
-                                              email: emailController.text,
-                                              password: passwordController.text,
-                                            );
-                                            FirebaseAuth.instance.currentUser!
-                                                .updateDisplayName(
-                                                    nameController.text);
                                             Map response =
                                                 await SetuAPI.createConsent(
                                                     phoneController.text);
@@ -479,6 +471,17 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                                                     pathParameters: {
                                                       'url': response['id']
                                                     }).then((value) async {
+                                                  await FirebaseAuth.instance
+                                                      .createUserWithEmailAndPassword(
+                                                    email: emailController.text,
+                                                    password:
+                                                        passwordController.text,
+                                                  );
+                                                  FirebaseAuth
+                                                      .instance.currentUser!
+                                                      .updateDisplayName(
+                                                          nameController.text);
+
                                                   FirebaseAuth
                                                       .instance.currentUser!
                                                       .reload();
@@ -507,8 +510,12 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                                                               sessionID,
                                                           'consentDetails':
                                                               consentDetails,
+                                                          'transactions': Map<
+                                                              String,
+                                                              dynamic>.from({}),
                                                           'eomBalance': 0.0,
                                                           'monthlyBudget': 0.0,
+                                                          'spentRatio': 0.0,
                                                           'avatar':
                                                               selectedAvatar ==
                                                                       0
@@ -542,8 +549,12 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                                                           'consentDetails': Map<
                                                               String,
                                                               dynamic>.from({}),
+                                                          'transactions': Map<
+                                                              String,
+                                                              dynamic>.from({}),
                                                           'eomBalance': 0.0,
                                                           'monthlyBudget': 0.0,
+                                                          'spentRatio': 0.0,
                                                           'avatar':
                                                               selectedAvatar ==
                                                                       0
@@ -591,7 +602,8 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                                               left: 50.0,
                                               right: 50.0),
                                           decoration: ShapeDecoration(
-                                            color: const Color(0xFF3369FF),
+                                            color: const Color.fromARGB(
+                                                255, 51, 105, 255),
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(15.0),
