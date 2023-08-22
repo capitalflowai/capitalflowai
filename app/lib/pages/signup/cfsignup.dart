@@ -13,11 +13,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
-final consentAcceptCheck = StateProvider<bool>((ref) {
-  bool temp = false;
-  return temp;
-});
-
 class CFSignUp extends ConsumerStatefulWidget {
   const CFSignUp({super.key});
 
@@ -451,44 +446,33 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                                             selectConsent = false;
                                             isLoadingConsent = true;
                                           });
-                                          // GoRouter.of(context).pushNamed(
-                                          //     "webview",
-                                          //     pathParameters: {
-                                          //       'url': "google"
-                                          //     }).then((value) {
-                                          //   // GoRouter.of(context).pushNamed(
-                                          //   //     CFRouteNames.homeRouteName);
-                                          // });
-
                                           try {
                                             Map response =
                                                 await SetuAPI.createConsent(
                                                     phoneController.text);
                                             if (response.isNotEmpty) {
+                                              await FirebaseAuth.instance
+                                                  .createUserWithEmailAndPassword(
+                                                email: emailController.text,
+                                                password:
+                                                    passwordController.text,
+                                              );
+                                              await FirebaseAuth
+                                                  .instance.currentUser!
+                                                  .updateDisplayName(
+                                                      nameController.text);
                                               if (mounted) {
                                                 GoRouter.of(context).pushNamed(
                                                     "webview",
                                                     pathParameters: {
                                                       'url': response['id']
                                                     }).then((value) async {
-                                                  await FirebaseAuth.instance
-                                                      .createUserWithEmailAndPassword(
-                                                    email: emailController.text,
-                                                    password:
-                                                        passwordController.text,
-                                                  );
-                                                  FirebaseAuth
-                                                      .instance.currentUser!
-                                                      .updateDisplayName(
-                                                          nameController.text);
-
-                                                  FirebaseAuth
+                                                  await FirebaseAuth
                                                       .instance.currentUser!
                                                       .reload();
-                                                  if (ref
-                                                      .read(consentAcceptCheck
-                                                          .notifier)
-                                                      .state) {
+                                                  if (value
+                                                      .toString()
+                                                      .contains("approved")) {
                                                     Map consentDetails =
                                                         await SetuAPI
                                                             .getConsent(
@@ -503,6 +487,9 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                                                             .state =
                                                         CFUser.fromMap(
                                                             {
+                                                          'phone':
+                                                              phoneController
+                                                                  .text,
                                                           'consentID':
                                                               response['id'],
                                                           'hasConsented': true,
@@ -525,7 +512,8 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                                                             FirebaseAuth
                                                                 .instance
                                                                 .currentUser);
-                                                    FirebaseFirestore.instance
+                                                    await FirebaseFirestore
+                                                        .instance
                                                         .collection("users")
                                                         .doc(ref
                                                             .read(userProvider
@@ -546,6 +534,9 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                                                             {
                                                           'consentID': '',
                                                           'hasConsented': false,
+                                                          'phone':
+                                                              phoneController
+                                                                  .text,
                                                           'consentDetails': Map<
                                                               String,
                                                               dynamic>.from({}),
@@ -564,6 +555,19 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                                                             FirebaseAuth
                                                                 .instance
                                                                 .currentUser);
+                                                    await FirebaseFirestore
+                                                        .instance
+                                                        .collection("users")
+                                                        .doc(ref
+                                                            .read(userProvider
+                                                                .notifier)
+                                                            .state!
+                                                            .uid)
+                                                        .set(ref
+                                                            .read(userProvider
+                                                                .notifier)
+                                                            .state!
+                                                            .toMap());
                                                   }
 
                                                   if (mounted) {

@@ -5,7 +5,6 @@ import 'package:CapitalFlowAI/routes/cfroute_names.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,12 +29,11 @@ class _CFSplashState extends ConsumerState<CFSplash> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 300), checkLogin);
+    Future.delayed(const Duration(milliseconds: 1), checkLogin);
   }
 
   void checkLogin() async {
     User? tempUser = FirebaseAuth.instance.currentUser;
-
     if (tempUser != null) {
       DocumentReference reference =
           FirebaseFirestore.instance.collection("users").doc(tempUser.uid);
@@ -44,19 +42,21 @@ class _CFSplashState extends ConsumerState<CFSplash> {
         Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
         ref.read(userProvider.notifier).state =
             CFUser.fromMap(data, FirebaseAuth.instance.currentUser);
-        DocumentSnapshot documentSnapshot = await reference
-            .collection('data')
-            .doc(ref.read(userProvider.notifier).state!.sessionID)
-            .get();
-        if (documentSnapshot.exists) {
-          ref.read(userProvider.notifier).state!.transactions =
-              documentSnapshot.data() as Map<String, dynamic>;
-          Map<String, dynamic> sliderData =
-              ref.read(userProvider.notifier).state!.transactions;
-          sliderData['budget'] =
-              ref.read(userProvider.notifier).state!.monthlyBudget;
-          ref.read(userProvider.notifier).state!.spentRatio =
-              await CFServer.sliderGraph(sliderData);
+        if (ref.read(userProvider.notifier).state!.sessionID.isNotEmpty) {
+          DocumentSnapshot documentSnapshot = await reference
+              .collection('data')
+              .doc(ref.read(userProvider.notifier).state!.sessionID)
+              .get();
+          if (documentSnapshot.exists) {
+            ref.read(userProvider.notifier).state!.transactions =
+                documentSnapshot.data() as Map<String, dynamic>;
+            Map<String, dynamic> sliderData =
+                ref.read(userProvider.notifier).state!.transactions;
+            sliderData['budget'] =
+                ref.read(userProvider.notifier).state!.monthlyBudget;
+            // ref.read(userProvider.notifier).state!.spentRatio =
+            //     await CFServer.sliderGraph(sliderData);
+          }
         }
 
         if (mounted) {

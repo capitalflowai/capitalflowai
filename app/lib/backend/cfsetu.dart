@@ -27,14 +27,14 @@ class SetuAPI {
           "consentExpiry": oneYearLater,
           "Customer": {"id": "$phoneNumber@onemoney"},
           "FIDataRange": {
-            "from": "2021-06-30T00:00:00Z",
-            "to": "2023-06-30T00:00:00Z"
+            "from": "2023-06-01T00:00:00Z",
+            "to": "2023-08-21T00:00:00Z"
           },
           "consentMode": "STORE",
           "consentTypes": ["TRANSACTIONS", "PROFILE", "SUMMARY"],
           "fetchType": "PERIODIC",
           "Frequency": {"value": 30, "unit": "MONTH"},
-          "DataLife": {"value": 1, "unit": "MONTH"},
+          "DataLife": {"value": 100, "unit": "MONTH"},
           "DataConsumer": {"id": "setu-fiu-id"},
           "Purpose": {
             "Category": {"type": "string"},
@@ -86,12 +86,13 @@ class SetuAPI {
       body: json.encode({
         "consentId": consentID,
         "DataRange": {
-          "from": "2021-06-30T00:00:00.000Z",
-          "to": "2023-06-30T00:00:00.000Z"
+          "from": "2023-06-01T00:00:00.000Z",
+          "to": "2023-08-20T00:00:00.000Z"
         },
         "format": "json"
       }),
     );
+    print(response.body);
     return json.decode(response.body)['id'];
   }
 

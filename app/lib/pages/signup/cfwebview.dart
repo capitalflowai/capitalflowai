@@ -1,4 +1,4 @@
-import 'package:CapitalFlowAI/pages/signup/cfsignup.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -54,7 +54,7 @@ class _CFWebViewState extends ConsumerState<CFWebView> {
                 children: [
                   IconButton(
                     onPressed: () {
-                      GoRouter.of(context).pop();
+                      GoRouter.of(context).pop(webViewController!.getUrl());
                     },
                     icon: const Icon(FeatherIcons.x),
                   ),
@@ -95,12 +95,8 @@ class _CFWebViewState extends ConsumerState<CFWebView> {
                 },
                 onLoadStart: (controller, url) {
                   if (url.toString().startsWith("https://setu.co")) {
-                    if (url.toString().contains("success")) {
-                      ref.read(consentAcceptCheck.notifier).state = true;
-                    }
-
                     NavigationActionPolicy.CANCEL;
-                    GoRouter.of(context).pop();
+                    GoRouter.of(context).pop("approved");
                   }
                 },
               ),

@@ -1,6 +1,7 @@
 import 'package:CapitalFlowAI/pages/welcome/cfsplash.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 class CFBalanceSlider extends ConsumerStatefulWidget {
   final double spentRatio;
@@ -13,6 +14,8 @@ class CFBalanceSlider extends ConsumerStatefulWidget {
 class _CFBalanceSliderState extends ConsumerState<CFBalanceSlider> {
   double width = 0.0;
   bool isVisible = false;
+  final indianRupeesFormat =
+      NumberFormat.currency(name: "Rs. ", locale: 'en_IN', decimalDigits: 2);
 
   @override
   void initState() {
@@ -69,7 +72,9 @@ class _CFBalanceSliderState extends ConsumerState<CFBalanceSlider> {
                     height: 10.0,
                   ),
                   Text(
-                    "Rs. ${(ref.read(userProvider.notifier).state!.monthlyBudget * (widget.spentRatio / 100)).toInt()}",
+                    indianRupeesFormat.format(
+                        ref.read(userProvider.notifier).state!.monthlyBudget *
+                            (widget.spentRatio / 100)),
                     style: const TextStyle(fontSize: 17.0, color: Colors.white),
                   ),
                 ],
@@ -118,7 +123,8 @@ class _CFBalanceSliderState extends ConsumerState<CFBalanceSlider> {
                     height: 10.0,
                   ),
                   Text(
-                    "Rs. ${(ref.read(userProvider.notifier).state!.monthlyBudget).toInt()}",
+                    indianRupeesFormat.format(
+                        ref.read(userProvider.notifier).state!.monthlyBudget),
                     style: const TextStyle(fontSize: 17.0, color: Colors.black),
                   ),
                 ],

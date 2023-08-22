@@ -3,6 +3,7 @@ import 'package:CapitalFlowAI/components/cfconstants.dart';
 import 'package:CapitalFlowAI/pages/welcome/cfsplash.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 class CFBalance extends ConsumerStatefulWidget {
   final double spentPercentage;
@@ -13,6 +14,9 @@ class CFBalance extends ConsumerStatefulWidget {
 }
 
 class _CFBalanceState extends ConsumerState<CFBalance> {
+  final indianRupeesFormat =
+      NumberFormat.currency(name: "Rs. ", locale: 'en_IN', decimalDigits: 2);
+
   @override
   void initState() {
     super.initState();
@@ -56,36 +60,11 @@ class _CFBalanceState extends ConsumerState<CFBalance> {
               ),
             ),
           ),
-          //total budget text
-          const Positioned(
-            top: 35,
-            left: 20,
-            child: Text(
-              'Federal Bank',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w400,
-                color: Colors.black,
-              ),
-            ),
-          ),
-          //budget money value
-          const Positioned(
-            top: 65,
-            left: 20,
-            child: Text(
-              "Debit",
-              style: TextStyle(
-                  fontSize: 17.5,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w300),
-            ),
-          ),
           //money spent text
           const Padding(
-            padding: EdgeInsets.only(bottom: 35.0, right: 45.0),
+            padding: EdgeInsets.only(top: 40.0, left: 25.0),
             child: Align(
-              alignment: Alignment.bottomRight,
+              alignment: Alignment.topLeft,
               child: Text(
                 'Account Balance',
                 style: TextStyle(
@@ -97,15 +76,39 @@ class _CFBalanceState extends ConsumerState<CFBalance> {
           ),
           //money spent value
           Padding(
-            padding: const EdgeInsets.only(bottom: 10.0, right: 45.0),
+            padding: const EdgeInsets.only(top: 70.0, left: 25.0),
             child: Align(
-              alignment: Alignment.bottomRight,
+              alignment: Alignment.topLeft,
               child: Text(
-                "Rs. ${ref.read(userProvider.notifier).state!.transactions['Payload'][0]['data'][0]['decryptedFI']['account']['summary']['currentBalance']}",
+                indianRupeesFormat.format(double.parse(ref
+                        .read(userProvider.notifier)
+                        .state!
+                        .transactions['Payload'][0]['data'][0]['decryptedFI']
+                    ['account']['summary']['currentBalance'])),
                 style: const TextStyle(
                     fontSize: 17.5,
                     color: Colors.black,
                     fontWeight: FontWeight.w300),
+              ),
+            ),
+          ),
+          //Masked Account Number
+          Padding(
+            padding: const EdgeInsets.only(bottom: 45.0, right: 45.0),
+            child: Align(
+              alignment: Alignment.bottomRight,
+              child: Text(
+                  "${ref.read(userProvider.notifier).state!.transactions['Payload'][0]['data'][0]['maskedAccNumber']}"),
+            ),
+          ),
+          Padding(
+            padding:
+                const EdgeInsets.only(top: 20.0, bottom: 25.0, right: 45.0),
+            child: Align(
+              alignment: Alignment.bottomRight,
+              child: Text(
+                "${ref.read(userProvider.notifier).state!.transactions['Payload'][0]['data'][0]['decryptedFI']['account']['summary']['type']}",
+                style: const TextStyle(fontWeight: FontWeight.w300),
               ),
             ),
           ),

@@ -51,7 +51,7 @@ class _CFMidasState extends State<CFMidas> {
     http.Response response = await http.post(
       Uri.http(CFConstants.cfServerURL, "/midasai"),
       headers: {'Content-Type': 'application/json'},
-      body: json.encode({'message': "what"}),
+      body: json.encode({'message': query}),
     );
     setState(() {
       messages.add([json.decode(response.body)['message'], false]);

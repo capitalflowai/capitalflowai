@@ -11,4 +11,16 @@ class CFServer {
     );
     return json.decode(response.body)['percentage'];
   }
+
+  static Future<Map<String, dynamic>> pieChart(
+      Map<String, dynamic> data) async {
+    Response response = await post(
+      Uri.https(CFConstants.cfServerURL, "/ModePieChart"),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(data),
+    );
+    Map body = json.decode(response.body);
+
+    return body['mode_percentages'];
+  }
 }

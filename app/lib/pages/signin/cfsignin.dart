@@ -1,3 +1,4 @@
+import 'package:CapitalFlowAI/backend/cfserver.dart';
 import 'package:CapitalFlowAI/components/cfuser.dart';
 import 'package:CapitalFlowAI/pages/welcome/cfsplash.dart';
 import 'package:CapitalFlowAI/routes/cfroute_names.dart';
@@ -189,6 +190,7 @@ class _CFSignInState extends ConsumerState<CFSignIn> {
                       selectSign = false;
                     });
                     if (_formKey.currentState!.validate()) {
+                      FocusScope.of(context).unfocus();
                       try {
                         await FirebaseAuth.instance.signInWithEmailAndPassword(
                             email: emailController.text,
@@ -204,17 +206,36 @@ class _CFSignInState extends ConsumerState<CFSignIn> {
                             snapshot.data() as Map<String, dynamic>;
                         ref.read(userProvider.notifier).state = CFUser.fromMap(
                             data, FirebaseAuth.instance.currentUser);
-                        DocumentSnapshot documentSnapshot =
-                            await documentReference
-                                .collection('data')
-                                .doc(ref
+                        if (ref
+                            .read(userProvider.notifier)
+                            .state!
+                            .sessionID
+                            .isNotEmpty) {
+                          DocumentSnapshot documentSnapshot =
+                              await documentReference
+                                  .collection('data')
+                                  .doc(ref
+                                      .read(userProvider.notifier)
+                                      .state!
+                                      .sessionID)
+                                  .get();
+                          if (documentSnapshot.exists) {
+                            ref
                                     .read(userProvider.notifier)
                                     .state!
-                                    .sessionID)
-                                .get();
-                        if (documentSnapshot.exists) {
-                          ref.read(userProvider.notifier).state!.transactions =
-                              documentSnapshot.data() as Map<String, dynamic>;
+                                    .transactions =
+                                documentSnapshot.data() as Map<String, dynamic>;
+                            Map<String, dynamic> data = ref
+                                .read(userProvider.notifier)
+                                .state!
+                                .transactions;
+                            data['budget'] = ref
+                                .read(userProvider.notifier)
+                                .state!
+                                .monthlyBudget;
+                            ref.read(userProvider.notifier).state!.spentRatio =
+                                await CFServer.sliderGraph(data);
+                          }
                         }
                         if (mounted) {
                           GoRouter.of(context)
@@ -230,7 +251,9 @@ class _CFSignInState extends ConsumerState<CFSignIn> {
                           const Duration(seconds: 3),
                           () {
                             errorMessage = "";
-                            setState(() {});
+                            if (mounted) {
+                              setState(() {});
+                            }
                           },
                         );
                         setState(() {});

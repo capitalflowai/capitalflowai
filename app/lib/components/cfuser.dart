@@ -4,6 +4,7 @@ class CFUser {
   String name = "";
   String email = "";
   String uid = "";
+  String phone = "";
   String consentID = "";
   String sessionID = "";
   double eomBalance = 0.0;
@@ -18,6 +19,7 @@ class CFUser {
     required this.name,
     required this.email,
     required this.uid,
+    required this.phone,
     required this.consentID,
     required this.hasConsented,
     required this.consentDetails,
@@ -35,6 +37,7 @@ class CFUser {
         uid = tempUser.uid,
         consentID = initialMap['consentID'] ?? '',
         sessionID = initialMap['sessionID'] ?? '',
+        phone = initialMap['phone'] ?? '',
         eomBalance = initialMap['eomBalance'] ?? 0.0,
         monthlyBudget = initialMap['monthlyBudget'] ?? 0.0,
         spentRatio = initialMap['spentRatio'] ?? 0.0,
@@ -48,6 +51,7 @@ class CFUser {
       'name': name,
       'email': email,
       'uid': uid,
+      'phone': phone,
       'consentID': consentID,
       'sessionID': sessionID,
       'eomBalance': eomBalance,
