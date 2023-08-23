@@ -13,11 +13,6 @@ final userProvider = StateProvider<CFUser?>((ref) {
   return null;
 });
 
-final consentAcceptCheck = StateProvider<bool>((ref) {
-  bool temp = false;
-  return temp;
-});
-
 class CFSplash extends ConsumerStatefulWidget {
   const CFSplash({super.key});
 
@@ -34,6 +29,7 @@ class _CFSplashState extends ConsumerState<CFSplash> {
 
   void checkLogin() async {
     User? tempUser = FirebaseAuth.instance.currentUser;
+
     if (tempUser != null) {
       DocumentReference reference =
           FirebaseFirestore.instance.collection("users").doc(tempUser.uid);
@@ -54,8 +50,8 @@ class _CFSplashState extends ConsumerState<CFSplash> {
                 ref.read(userProvider.notifier).state!.transactions;
             sliderData['budget'] =
                 ref.read(userProvider.notifier).state!.monthlyBudget;
-            // ref.read(userProvider.notifier).state!.spentRatio =
-            //     await CFServer.sliderGraph(sliderData);
+            ref.read(userProvider.notifier).state!.spentRatio =
+                await CFServer.sliderGraph(sliderData);
           }
         }
 
@@ -88,9 +84,9 @@ class _CFSplashState extends ConsumerState<CFSplash> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Center(
-        child: Text("Om Shivaya Namaha"),
+        child: Image.asset("assets/logo.png"),
       ),
     );
   }

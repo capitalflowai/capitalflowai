@@ -193,7 +193,6 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                           }
                           return null;
                         },
-                        maxLength: 10,
                         decoration: InputDecoration(
                           counterText: "",
                           isDense: true,
@@ -579,7 +578,9 @@ class _CFSignUpState extends ConsumerState<CFSignUp> {
                                               }
                                             }
                                           } on FirebaseAuthException catch (e) {
-                                            Navigator.of(context).pop();
+                                            if (mounted) {
+                                              Navigator.of(context).pop();
+                                            }
                                             if (e.code ==
                                                 'email-already-in-use') {
                                               errorMessage =

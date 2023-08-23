@@ -19,9 +19,9 @@ class _CFOnboardingState extends State<CFOnboarding> {
   bool isPressed = false;
 
   List<Widget> onboardingScreens = [
-    const CFOnboardingOne(),
+    const CFOnboardingThree(),
     const CFOnboardingTwo(),
-    const CFOnboardingThree()
+    const CFOnboardingOne(),
   ];
 
   @override
@@ -115,7 +115,7 @@ class _CFOnboardingState extends State<CFOnboarding> {
                       height: index == 2 ? 50 : 5,
                       decoration: BoxDecoration(
                         color: index == 2
-                            ? const Color.fromARGB(255, 51, 105, 255)
+                            ? const Color.fromARGB(255, 81, 121, 230)
                             : const Color.fromARGB(255, 51, 105, 255)
                                 .withOpacity(0.6),
                         borderRadius:
@@ -123,9 +123,9 @@ class _CFOnboardingState extends State<CFOnboarding> {
                         boxShadow: index == 2
                             ? [
                                 BoxShadow(
-                                  spreadRadius: !isPressed ? .5 : 0,
-                                  blurRadius: !isPressed ? 7.5 : 0,
-                                  color: Colors.black54,
+                                  spreadRadius: !isPressed ? .1 : 0,
+                                  blurRadius: !isPressed ? 12.5 : 0,
+                                  color: Colors.black38,
                                 ),
                               ]
                             : [],

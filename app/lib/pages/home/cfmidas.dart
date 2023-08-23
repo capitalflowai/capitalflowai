@@ -31,7 +31,8 @@ class _CFMidasState extends State<CFMidas> {
         if (!scrollController.position.atEdge) {
           canScroll = true;
         } else {
-          if (scrollController.position.pixels != 0) {
+          if (scrollController.position.pixels !=
+              scrollController.position.maxScrollExtent) {
             canScroll = false;
           }
         }
@@ -184,7 +185,7 @@ class _CFMidasState extends State<CFMidas> {
                               const Color.fromARGB(255, 199, 208, 255),
                           onPressed: () {
                             scrollController.animateTo(
-                                scrollController.position.maxScrollExtent,
+                                scrollController.position.minScrollExtent,
                                 duration: const Duration(milliseconds: 300),
                                 curve: Curves.decelerate);
                           },

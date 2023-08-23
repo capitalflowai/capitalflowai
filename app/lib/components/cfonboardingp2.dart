@@ -27,9 +27,9 @@ class _CFOnboardingTwoState extends State<CFOnboardingTwo> {
                 child: Column(
                   children: [
                     Text(
-                      "Quick analysis of all expenses",
+                      "Insights today for a wealthy tomorrow",
                       style: TextStyle(
-                        fontSize: 50.0,
+                        fontSize: 45.0,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
@@ -37,7 +37,7 @@ class _CFOnboardingTwoState extends State<CFOnboardingTwo> {
                       height: 10,
                     ),
                     Text(
-                      "random bs gooo lorem ipsum blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah ",
+                      "Learn your spending habits, investment opportunities and more to gain insights today for a wealthy tomorrow and secure your financial future.",
                       style: TextStyle(
                         fontSize: 16.0,
                         fontWeight: FontWeight.w300,

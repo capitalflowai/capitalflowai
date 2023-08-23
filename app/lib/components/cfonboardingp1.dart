@@ -27,7 +27,7 @@ class _CFOnboardingOneState extends State<CFOnboardingOne> {
                 child: Column(
                   children: [
                     Text(
-                      "New approach for your\nFinance",
+                      "Your consent is our priority",
                       style: TextStyle(
                         fontSize: 45.0,
                         fontWeight: FontWeight.w400,
@@ -37,7 +37,7 @@ class _CFOnboardingOneState extends State<CFOnboardingOne> {
                       height: 10,
                     ),
                     Text(
-                      "Now your finances are in one place and always under control",
+                      "Assurance of security and privacy, with explicit consent. We prioritize your data protection. Your privacy is important to us.",
                       style: TextStyle(
                         fontSize: 16.0,
                         fontWeight: FontWeight.w300,

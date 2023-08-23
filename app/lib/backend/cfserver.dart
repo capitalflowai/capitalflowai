@@ -23,4 +23,16 @@ class CFServer {
 
     return body['mode_percentages'];
   }
+
+  static Future<List> barChart(Map<String, dynamic> data) async {
+    Response response = await post(
+      Uri.https(CFConstants.cfServerURL, "/ExpensesByFrequency"),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(data),
+    );
+
+    List body = json.decode(response.body);
+
+    return body;
+  }
 }

@@ -16,7 +16,8 @@ class _CFOnboardingThreeState extends State<CFOnboardingThree> {
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
           decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 248, 238, 213),
+            // color: const Color.fromARGB(255, 248, 238, 213),
+            color: Color.fromARGB(255, 204, 181, 251),
             borderRadius: BorderRadius.circular(20.0),
           ),
           child: Stack(
@@ -27,7 +28,7 @@ class _CFOnboardingThreeState extends State<CFOnboardingThree> {
                 child: Column(
                   children: [
                     Text(
-                      "Tips to optimize spending",
+                      "Finance at your fingertips",
                       style: TextStyle(
                         fontSize: 45.0,
                         fontWeight: FontWeight.w400,
@@ -37,7 +38,7 @@ class _CFOnboardingThreeState extends State<CFOnboardingThree> {
                       height: 10,
                     ),
                     Text(
-                      "The system notices where you're slipping on the budget and tells you how to optimize costs",
+                      "Never again need to log your expense, we track it as you spend.Stay on top of your financial goals with personalized insights. Securely connect your bank accounts for real-time updates",
                       style: TextStyle(
                         fontSize: 16.0,
                         fontWeight: FontWeight.w300,

@@ -30,6 +30,7 @@ class _CFBalanceSliderState extends ConsumerState<CFBalanceSlider> {
 
   @override
   Widget build(BuildContext context) {
+    print(width);
     if (isVisible) {
       if (width >= 0.5) {
         return Container(
