@@ -30,7 +30,6 @@ class _CFBalanceSliderState extends ConsumerState<CFBalanceSlider> {
 
   @override
   Widget build(BuildContext context) {
-    print(width);
     if (isVisible) {
       if (width >= 0.5) {
         return Container(
@@ -49,11 +48,13 @@ class _CFBalanceSliderState extends ConsumerState<CFBalanceSlider> {
           child: FractionallySizedBox(
             alignment: Alignment.centerLeft,
             heightFactor: 1,
-            widthFactor: width,
+            widthFactor: 1,
             child: Container(
               padding: const EdgeInsets.only(left: 20.0),
               decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 105, 81, 243),
+                color: width < 1.0
+                    ? const Color.fromARGB(255, 105, 81, 243)
+                    : Colors.red,
                 borderRadius: width != 1.0
                     ? const BorderRadius.only(
                         topLeft: Radius.circular(10.0),
@@ -65,19 +66,33 @@ class _CFBalanceSliderState extends ConsumerState<CFBalanceSlider> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Money Spent",
-                    style: TextStyle(fontSize: 20.0, color: Colors.white),
-                  ),
+                  width < 1.0
+                      ? const Text(
+                          "Money Spent",
+                          style: TextStyle(fontSize: 20.0, color: Colors.white),
+                        )
+                      : const Text(
+                          "Budget Exhausted",
+                          style: TextStyle(fontSize: 20.0, color: Colors.white),
+                        ),
                   const SizedBox(
                     height: 10.0,
                   ),
-                  Text(
-                    indianRupeesFormat.format(
-                        ref.read(userProvider.notifier).state!.monthlyBudget *
-                            (widget.spentRatio / 100)),
-                    style: const TextStyle(fontSize: 17.0, color: Colors.white),
-                  ),
+                  width < 1.0
+                      ? Text(
+                          indianRupeesFormat.format(ref
+                                  .read(userProvider.notifier)
+                                  .state!
+                                  .monthlyBudget *
+                              (widget.spentRatio / 100)),
+                          style: const TextStyle(
+                              fontSize: 17.0, color: Colors.white),
+                        )
+                      : Text(
+                          "Spent ${indianRupeesFormat.format(ref.read(userProvider.notifier).state!.monthlyBudget * (widget.spentRatio / 100))}!",
+                          style: const TextStyle(
+                              fontSize: 17.0, color: Colors.white),
+                        ),
                 ],
               ),
             ),
@@ -99,7 +114,7 @@ class _CFBalanceSliderState extends ConsumerState<CFBalanceSlider> {
           ),
           child: FractionallySizedBox(
             heightFactor: 1,
-            widthFactor: 1 - width,
+            widthFactor: 1.0 - width,
             alignment: Alignment.centerRight,
             child: Container(
               padding: const EdgeInsets.only(left: 10.0, right: 20.0),

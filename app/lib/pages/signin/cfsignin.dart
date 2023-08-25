@@ -234,7 +234,7 @@ class _CFSignInState extends ConsumerState<CFSignIn> {
                                 .state!
                                 .monthlyBudget;
                             ref.read(userProvider.notifier).state!.spentRatio =
-                                await CFServer.sliderGraph(data);
+                                CFServer.monthlyBudgetSlider(data);
                           }
                         }
                         if (mounted) {

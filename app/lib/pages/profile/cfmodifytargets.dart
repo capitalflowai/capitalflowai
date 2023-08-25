@@ -1,6 +1,7 @@
 import 'package:CapitalFlowAI/pages/welcome/cfsplash.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -79,10 +80,7 @@ class _CFModifyTargetsState extends ConsumerState<CFModifyTargets> {
                             top: 0.0, left: 0.0, right: 50.0),
                         child: TextFormField(
                           controller: eomController,
-                          keyboardType: TextInputType.phone,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly
-                          ],
+                          keyboardType: TextInputType.number,
                           validator: (value) {
                             if (value!.isEmpty ||
                                 double.parse(value) < 1.0 ||
@@ -127,10 +125,7 @@ class _CFModifyTargetsState extends ConsumerState<CFModifyTargets> {
                             top: 0.0, left: 0.0, right: 50.0),
                         child: TextFormField(
                           controller: monthlyBudgetController,
-                          keyboardType: TextInputType.phone,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly
-                          ],
+                          keyboardType: TextInputType.number,
                           validator: (value) {
                             if (value!.isEmpty ||
                                 double.parse(value) < 1.0 ||
@@ -174,6 +169,11 @@ class _CFModifyTargetsState extends ConsumerState<CFModifyTargets> {
                         double.parse(eomController.text);
                     ref.read(userProvider.notifier).state!.monthlyBudget =
                         double.parse(monthlyBudgetController.text);
+
+                    FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(ref.read(userProvider.notifier).state!.uid)
+                        .set(ref.read(userProvider.notifier).state!.toMap());
                     if (mounted) {
                       Navigator.of(context).pop(true);
                     }

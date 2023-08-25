@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -20,14 +21,14 @@ void main() async {
     ),
   );
   FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
-  // FlutterError.onError = (errorDetails) {
-  //   FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
-  // };
+  FlutterError.onError = (errorDetails) {
+    FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+  };
 
-  // PlatformDispatcher.instance.onError = (error, stack) {
-  //   FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-  //   return true;
-  // };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
   ErrorWidget.builder = (FlutterErrorDetails details) => Container();
   runApp(const ProviderScope(child: MyApp()));
 }
@@ -45,7 +46,7 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.blue.shade700,
         indicatorColor: Colors.blue.shade700,
         splashColor: Colors.transparent,
-        fontFamily: "Suisse Int'l",
+        fontFamily: GoogleFonts.nunito().fontFamily,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),

@@ -35,7 +35,6 @@ dependencies:
   firebase_auth: ^4.7.2
   firebase_core: ^2.15.0
   firebase_crashlytics: ^3.3.5
-  fl_chart: ^0.63.0
   flutter:
     sdk: flutter
   flutter_feather_icons: ^2.0.0+1

@@ -6,12 +6,13 @@ import 'package:CapitalFlowAI/components/cfconstants.dart';
 import 'package:CapitalFlowAI/components/cfsettargets.dart';
 import 'package:CapitalFlowAI/components/cfslider.dart';
 import 'package:CapitalFlowAI/components/cfuser.dart';
+import 'package:CapitalFlowAI/pages/home/cfinsights.dart';
 import 'package:CapitalFlowAI/pages/welcome/cfsplash.dart';
 import 'package:CapitalFlowAI/routes/cfroute_names.dart';
 import 'package:blur/blur.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fl_chart/fl_chart.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
@@ -39,10 +40,17 @@ class _CFHomeState extends ConsumerState<CFHome> {
   bool selectCreate = false;
   bool hasConsented = false;
   Map<String, dynamic> piechart = {};
-  List<PieChartSectionData> sections = [];
-  List<Color> colors = [Colors.red, Colors.blue, Colors.green, Colors.yellow];
+  Map<String, dynamic> linechart = {};
   int index = 0;
-  double maxY = 0;
+
+  List<PiechartData> pieData = [];
+  List<Color> colors = const [
+    Color.fromARGB(255, 0, 198, 178),
+    Color.fromARGB(255, 0, 145, 255),
+    Color.fromARGB(255, 88, 76, 177),
+    Color.fromARGB(255, 249, 249, 113),
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -58,8 +66,14 @@ class _CFHomeState extends ConsumerState<CFHome> {
         } else {
           isLoaded = true;
           isFirst = false;
-          piechart =
-              (await CFServer.pieChart(ref.read(userProvider)!.transactions));
+          piechart = CFServer.modePieChart(
+              ref.read(userProvider.notifier).state!.transactions);
+          for (var value in piechart.entries) {
+            pieData.add(PiechartData(value.key, value.value, colors[index]));
+            index++;
+          }
+          linechart = CFServer.lineGraph(
+              ref.read(userProvider.notifier).state!.transactions);
           setState(() {});
         }
       }
@@ -115,9 +129,16 @@ class _CFHomeState extends ConsumerState<CFHome> {
         ref.read(userProvider.notifier).state!.transactions;
     data['budget'] = ref.read(userProvider.notifier).state!.monthlyBudget;
     ref.read(userProvider.notifier).state!.spentRatio =
-        await CFServer.sliderGraph(data);
+        CFServer.monthlyBudgetSlider(data);
     isLoaded = true;
-    piechart = (await CFServer.pieChart(ref.read(userProvider)!.transactions));
+    piechart = CFServer.modePieChart(
+        ref.read(userProvider.notifier).state!.transactions);
+    for (var value in piechart.entries) {
+      pieData.add(PiechartData(value.key, value.value, colors[index]));
+      index++;
+    }
+    linechart =
+        CFServer.lineGraph(ref.read(userProvider.notifier).state!.transactions);
     setState(() {});
   }
 
@@ -157,23 +178,423 @@ class _CFHomeState extends ConsumerState<CFHome> {
         if (!isFirst) {
           return Scaffold(
             body: SafeArea(
-              child: AnimatedSwitcher(
-                switchOutCurve: Curves.easeInOut,
-                duration: const Duration(milliseconds: 250),
-                child: isLoaded
-                    //loaded values
-                    ? Column(
-                        key: const Key('Column1'),
-                        children: [
-                          Expanded(
-                            child: ListView(
-                              padding: const EdgeInsets.only(
-                                left: 20.0,
-                                right: 20.0,
-                                bottom: 20.0,
-                              ),
+              child: bottomNavigationIndex == 0
+                  ? AnimatedSwitcher(
+                      switchOutCurve: Curves.easeInOut,
+                      duration: const Duration(milliseconds: 250),
+                      child: isLoaded
+                          //loaded values
+                          ? Column(
+                              key: const Key('Column1'),
                               children: [
-                                //user status
+                                Expanded(
+                                  child: ListView(
+                                    padding: const EdgeInsets.only(
+                                      left: 20.0,
+                                      right: 20.0,
+                                      bottom: 20.0,
+                                    ),
+                                    children: [
+                                      //user status
+                                      Container(
+                                        margin:
+                                            const EdgeInsets.only(top: 25.0),
+                                        width: double.maxFinite,
+                                        padding: const EdgeInsets.only(
+                                            left: 10.0,
+                                            right: 10.0,
+                                            top: 10.0,
+                                            bottom: 10.0),
+                                        decoration: BoxDecoration(
+                                          color: const Color.fromARGB(
+                                              255, 241, 241, 243),
+                                          borderRadius:
+                                              BorderRadius.circular(100.0),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Stack(
+                                              children: [
+                                                GestureDetector(
+                                                  behavior: HitTestBehavior
+                                                      .translucent,
+                                                  onTap: () {},
+                                                  onLongPress: () async {
+                                                    FirebaseAuth instance =
+                                                        FirebaseAuth.instance;
+                                                    await instance.signOut();
+                                                    if (mounted) {
+                                                      GoRouter.of(context)
+                                                          .goNamed(CFRouteNames
+                                                              .welcomeRouteName);
+                                                    }
+                                                  },
+                                                  child: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10.0),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              100.0),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                            offset:
+                                                                const Offset(
+                                                                    0, 0),
+                                                            spreadRadius: .1,
+                                                            blurRadius: 2.0,
+                                                            color: Colors.black
+                                                                .withOpacity(
+                                                                    0.3)),
+                                                      ],
+                                                    ),
+                                                    child: const Icon(
+                                                      FeatherIcons.bell,
+                                                      color: Color.fromARGB(
+                                                          255, 21, 128, 222),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Positioned(
+                                                  top: 2,
+                                                  right: 1,
+                                                  child: AnimatedContainer(
+                                                    duration: const Duration(
+                                                        milliseconds: 200),
+                                                    width: 10,
+                                                    height: 10,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              100.0),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                Text.rich(
+                                                  TextSpan(
+                                                    children: [
+                                                      TextSpan(
+                                                          text:
+                                                              greetingMessage),
+                                                      TextSpan(
+                                                          text:
+                                                              "${ref.watch(userProvider.notifier).state!.name.substring(0, 1).toUpperCase()}${ref.watch(userProvider.notifier).state!.name.substring(1)}!")
+                                                    ],
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                  width: 5.0,
+                                                ),
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    GoRouter.of(context)
+                                                        .pushNamed(CFRouteNames
+                                                            .profileRouteName)
+                                                        .then((value) {
+                                                      if (value == true) {
+                                                        getGraphs();
+                                                      }
+                                                      setState(() {});
+                                                    });
+                                                  },
+                                                  child: CFAvatar(
+                                                      name:
+                                                          "assets/${ref.read(userProvider.notifier).state!.avatar}.png",
+                                                      width: 40,
+                                                      color: ref
+                                                                  .read(userProvider
+                                                                      .notifier)
+                                                                  .state!
+                                                                  .avatar ==
+                                                              "maleAvatar"
+                                                          ? CFConstants
+                                                              .maleColor
+                                                          : CFConstants
+                                                              .femaleColor,
+                                                      isSelected: -1,
+                                                      isBorder: false),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      //balance card
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 40.0),
+                                        child: CFBalance(
+                                          spentPercentage: ref
+                                              .read(userProvider.notifier)
+                                              .state!
+                                              .spentRatio,
+                                          key: Key(
+                                              "$ref.read(userProvider.notifier).state!.spentRatio ok"),
+                                        ),
+                                      ),
+                                      //Padding
+                                      const SizedBox(height: 25.0),
+                                      CFBalanceSlider(
+                                        ref
+                                            .read(userProvider.notifier)
+                                            .state!
+                                            .spentRatio,
+                                        key: Key(ref
+                                            .read(userProvider.notifier)
+                                            .state!
+                                            .spentRatio
+                                            .toString()),
+                                      ),
+                                      const SizedBox(height: 25.0),
+                                      //PieChart
+                                      Container(
+                                        padding: const EdgeInsets.only(
+                                            left: 15.0,
+                                            top: 15.0,
+                                            right: 15.0,
+                                            bottom: 15.0),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(15.0),
+                                          color: Colors.white,
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              offset: Offset(0, 0),
+                                              spreadRadius: 3.0,
+                                              blurRadius: 7.5,
+                                              color: Colors.black12,
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "Expenses In ${DateFormat('MMMM').format(DateTime.now())}",
+                                              style: GoogleFonts.nunito(
+                                                textStyle: const TextStyle(
+                                                  fontSize: 20.0,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 20.0),
+                                            Center(
+                                              child: SizedBox(
+                                                height: 100,
+                                                child: SfCircularChart(
+                                                  legend: const Legend(
+                                                    isVisible: true,
+                                                  ),
+                                                  margin: EdgeInsets.zero,
+                                                  series: [
+                                                    PieSeries(
+                                                      xValueMapper: (data, _) =>
+                                                          data.x,
+                                                      yValueMapper: (data, _) =>
+                                                          data.y,
+                                                      dataLabelMapper:
+                                                          (data, _) => data.x,
+                                                      pointColorMapper:
+                                                          (data, index) =>
+                                                              data.color,
+                                                      radius: '100%',
+                                                      dataLabelSettings:
+                                                          const DataLabelSettings(
+                                                        showZeroValue: false,
+                                                        margin: EdgeInsets.only(
+                                                            top: 0),
+                                                        isVisible: true,
+                                                      ),
+                                                      dataSource: pieData,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20.0),
+                                      //BarChart
+                                      // Container(
+                                      //   padding: const EdgeInsets.only(
+                                      //       left: 15.0,
+                                      //       top: 15.0,
+                                      //       right: 15.0,
+                                      //       bottom: 15.0),
+                                      //   decoration: BoxDecoration(
+                                      //     borderRadius: BorderRadius.circular(15.0),
+                                      //     color: Colors.white,
+                                      //     boxShadow: const [
+                                      //       BoxShadow(
+                                      //         offset: Offset(0, 0),
+                                      //         spreadRadius: 3.0,
+                                      //         blurRadius: 7.5,
+                                      //         color: Colors.black12,
+                                      //       ),
+                                      //     ],
+                                      //   ),
+                                      //   child: Column(
+                                      //     crossAxisAlignment:
+                                      //         CrossAxisAlignment.start,
+                                      //     children: [
+                                      //       Text(
+                                      //         "5 day frequency in ${DateFormat('MMMM').format(DateTime.now())}",
+                                      //         style: GoogleFonts.nunito(
+                                      //           textStyle: const TextStyle(
+                                      //             fontSize: 20.0,
+                                      //             fontWeight: FontWeight.w700,
+                                      //           ),
+                                      //         ),
+                                      //       ),
+                                      //       const SizedBox(height: 30.0),
+                                      //       Center(
+                                      //         child: SizedBox(
+                                      //           height: 150,
+                                      //           child: SfCartesianChart(
+                                      //             series: [
+                                      //               HistogramSeries<ChartData,
+                                      //                       dynamic>(
+                                      //                   dataSource: barGroups,
+                                      //                   yValueMapper:
+                                      //                       (ChartData sales, _) =>
+                                      //                           sales.y,
+                                      //                   binInterval: 5,
+                                      //                   curveColor:
+                                      //                       const Color.fromRGBO(
+                                      //                           192, 108, 132, 1),
+                                      //                   borderWidth: 3),
+                                      //             ],
+                                      //           ),
+                                      //         ),
+                                      //       ),
+                                      //     ],
+                                      //   ),
+                                      // ),
+
+                                      //Line Chart
+                                      Container(
+                                        padding: const EdgeInsets.only(
+                                            left: 15.0,
+                                            top: 15.0,
+                                            right: 15.0,
+                                            bottom: 15.0),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(15.0),
+                                          color: Colors.white,
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              offset: Offset(0, 0),
+                                              spreadRadius: 3.0,
+                                              blurRadius: 7.5,
+                                              color: Colors.black12,
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "Expenses In ${DateFormat('MMMM').format(DateTime.now())}",
+                                              style: GoogleFonts.nunito(
+                                                textStyle: const TextStyle(
+                                                  fontSize: 20.0,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 30.0),
+                                            Center(
+                                              child: SizedBox(
+                                                height: 100,
+                                                child: SfCartesianChart(
+                                                  trackballBehavior:
+                                                      TrackballBehavior(
+                                                    lineWidth: 1.5,
+                                                    activationMode:
+                                                        ActivationMode
+                                                            .singleTap,
+                                                    enable: true,
+                                                    tooltipSettings:
+                                                        const InteractiveTooltip(
+                                                      enable: true,
+                                                      color: Color.fromARGB(
+                                                          254, 146, 92, 216),
+                                                    ),
+                                                  ),
+                                                  margin: EdgeInsets.zero,
+                                                  plotAreaBorderWidth: 0,
+                                                  primaryXAxis: NumericAxis(
+                                                    maximum: 31,
+                                                    minimum: 1,
+                                                    interval: 4,
+                                                    majorGridLines:
+                                                        const MajorGridLines(
+                                                            width: 0),
+                                                  ),
+                                                  primaryYAxis: NumericAxis(
+                                                    numberFormat: NumberFormat
+                                                        .compactCurrency(
+                                                            locale: "en-IN",
+                                                            name: "Rs. "),
+                                                    majorGridLines:
+                                                        const MajorGridLines(
+                                                      width: 0,
+                                                    ),
+                                                  ),
+                                                  series: <ChartSeries>[
+                                                    LineSeries<LineChartData,
+                                                            int>(
+                                                        width: 3.5,
+                                                        enableTooltip: true,
+                                                        dataSource: linechart
+                                                            .entries
+                                                            .map(
+                                                          (entry) {
+                                                            return LineChartData(
+                                                                int.parse(
+                                                                    entry.key),
+                                                                double.parse(entry
+                                                                    .value
+                                                                    .toString()));
+                                                          },
+                                                        ).toList(),
+                                                        xValueMapper:
+                                                            (LineChartData data,
+                                                                    _) =>
+                                                                data.x,
+                                                        yValueMapper:
+                                                            (LineChartData data,
+                                                                    _) =>
+                                                                data.y)
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            )
+                          //Fetching data first time
+                          : Column(
+                              key: const Key('Column2'),
+                              children: [
                                 Container(
                                   margin: const EdgeInsets.only(top: 25.0),
                                   width: double.maxFinite,
@@ -264,341 +685,61 @@ class _CFHomeState extends ConsumerState<CFHome> {
                                           const SizedBox(
                                             width: 5.0,
                                           ),
-                                          GestureDetector(
-                                            onTap: () {
-                                              GoRouter.of(context)
-                                                  .pushNamed(CFRouteNames
-                                                      .profileRouteName)
-                                                  .then((value) {
-                                                if (value == true) {
-                                                  getGraphs();
-                                                }
-                                                setState(() {});
-                                              });
-                                            },
-                                            child: CFAvatar(
-                                                name:
-                                                    "assets/${ref.read(userProvider.notifier).state!.avatar}.png",
-                                                width: 40,
-                                                color: ref
-                                                            .read(userProvider
-                                                                .notifier)
-                                                            .state!
-                                                            .avatar ==
-                                                        "maleAvatar"
-                                                    ? CFConstants.maleColor
-                                                    : CFConstants.femaleColor,
-                                                isSelected: -1,
-                                                isBorder: false),
-                                          ),
+                                          CFAvatar(
+                                              name:
+                                                  "assets/${ref.read(userProvider.notifier).state!.avatar}.png",
+                                              width: 40,
+                                              color: ref
+                                                          .read(userProvider
+                                                              .notifier)
+                                                          .state!
+                                                          .avatar ==
+                                                      "maleAvatar"
+                                                  ? CFConstants.maleColor
+                                                  : CFConstants.femaleColor,
+                                              isSelected: -1,
+                                              isBorder: false),
                                         ],
                                       ),
                                     ],
                                   ),
                                 ),
-                                //balance card
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 40.0),
-                                  child: CFBalance(
-                                    spentPercentage: ref
-                                        .read(userProvider.notifier)
-                                        .state!
-                                        .spentRatio,
-                                    key: Key(
-                                        "$ref.read(userProvider.notifier).state!.spentRatio ok"),
+                                const Spacer(),
+                                Transform.scale(
+                                  scale: 0.5,
+                                  child: const CircularProgressIndicator(
+                                    strokeWidth: 7.5,
                                   ),
                                 ),
-                                //Padding
-                                const SizedBox(height: 25.0),
-                                CFBalanceSlider(
-                                  ref
-                                      .read(userProvider.notifier)
-                                      .state!
-                                      .spentRatio,
-                                  key: Key(ref
-                                      .read(userProvider.notifier)
-                                      .state!
-                                      .spentRatio
-                                      .toString()),
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 20.0),
+                                  child: Text(
+                                      "Hang on, while we fetch your data!"),
                                 ),
-                                const SizedBox(height: 25.0),
-                                //PieChart
-                                Container(
-                                  padding: const EdgeInsets.only(
-                                      left: 15.0,
-                                      top: 15.0,
-                                      right: 15.0,
-                                      bottom: 15.0),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(15.0),
-                                    color: Colors.white,
-                                    boxShadow: const [
-                                      BoxShadow(
-                                        offset: Offset(0, 0),
-                                        spreadRadius: 3.0,
-                                        blurRadius: 7.5,
-                                        color: Colors.black12,
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "Expenses In ${DateFormat('MMMM').format(DateTime.now())}",
-                                        style: GoogleFonts.nunito(
-                                          textStyle: const TextStyle(
-                                            fontSize: 20.0,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 20.0),
-                                      Center(
-                                        child: SizedBox(
-                                          height: 100,
-                                          child: SfCircularChart(
-                                            legend: const Legend(
-                                              isVisible: true,
-                                            ),
-                                            margin: EdgeInsets.zero,
-                                            series: [
-                                              PieSeries(
-                                                xValueMapper: (data, _) =>
-                                                    data.x,
-                                                yValueMapper: (data, _) =>
-                                                    data.y,
-                                                dataLabelMapper: (data, _) =>
-                                                    data.x,
-                                                radius: '100%',
-                                                dataLabelSettings:
-                                                    const DataLabelSettings(
-                                                  showZeroValue: false,
-                                                  margin:
-                                                      EdgeInsets.only(top: 0),
-                                                  isVisible: true,
-                                                ),
-                                                dataSource:
-                                                    piechart.entries.map(
-                                                  (entry) {
-                                                    index--;
-                                                    return ChartData(
-                                                        entry.key, entry.value);
-                                                  },
-                                                ).toList(),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 20.0),
-                                //BarChart
-                                // Container(
-                                //   padding: const EdgeInsets.only(
-                                //       left: 15.0,
-                                //       top: 15.0,
-                                //       right: 15.0,
-                                //       bottom: 15.0),
-                                //   decoration: BoxDecoration(
-                                //     borderRadius: BorderRadius.circular(15.0),
-                                //     color: Colors.white,
-                                //     boxShadow: const [
-                                //       BoxShadow(
-                                //         offset: Offset(0, 0),
-                                //         spreadRadius: 3.0,
-                                //         blurRadius: 7.5,
-                                //         color: Colors.black12,
-                                //       ),
-                                //     ],
-                                //   ),
-                                //   child: Column(
-                                //     crossAxisAlignment:
-                                //         CrossAxisAlignment.start,
-                                //     children: [
-                                //       Text(
-                                //         "5 day frequency in ${DateFormat('MMMM').format(DateTime.now())}",
-                                //         style: GoogleFonts.nunito(
-                                //           textStyle: const TextStyle(
-                                //             fontSize: 20.0,
-                                //             fontWeight: FontWeight.w700,
-                                //           ),
-                                //         ),
-                                //       ),
-                                //       const SizedBox(height: 30.0),
-                                //       Center(
-                                //         child: SizedBox(
-                                //           height: 150,
-                                //           child: SfCartesianChart(
-                                //             series: [
-                                //               HistogramSeries<ChartData,
-                                //                       dynamic>(
-                                //                   dataSource: barGroups,
-                                //                   yValueMapper:
-                                //                       (ChartData sales, _) =>
-                                //                           sales.y,
-                                //                   binInterval: 5,
-                                //                   curveColor:
-                                //                       const Color.fromRGBO(
-                                //                           192, 108, 132, 1),
-                                //                   borderWidth: 3),
-                                //             ],
-                                //           ),
-                                //         ),
-                                //       ),
-                                //     ],
-                                //   ),
-                                // ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      )
-                    //Fetching data first time
-                    : Column(
-                        key: const Key('Column2'),
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.only(top: 25.0),
-                            width: double.maxFinite,
-                            padding: const EdgeInsets.only(
-                                left: 10.0,
-                                right: 10.0,
-                                top: 10.0,
-                                bottom: 10.0),
-                            decoration: BoxDecoration(
-                              color: const Color.fromARGB(255, 241, 241, 243),
-                              borderRadius: BorderRadius.circular(100.0),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Stack(
-                                  children: [
-                                    GestureDetector(
-                                      behavior: HitTestBehavior.translucent,
-                                      onTap: () {},
-                                      onLongPress: () async {
-                                        FirebaseAuth instance =
-                                            FirebaseAuth.instance;
-                                        await instance.signOut();
-                                        if (mounted) {
-                                          GoRouter.of(context).goNamed(
-                                              CFRouteNames.welcomeRouteName);
-                                        }
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.all(10.0),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(100.0),
-                                          boxShadow: [
-                                            BoxShadow(
-                                                offset: const Offset(0, 0),
-                                                spreadRadius: .1,
-                                                blurRadius: 2.0,
-                                                color: Colors.black
-                                                    .withOpacity(0.3)),
-                                          ],
-                                        ),
-                                        child: const Icon(
-                                          FeatherIcons.bell,
-                                          color:
-                                              Color.fromARGB(255, 21, 128, 222),
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      top: 2,
-                                      right: 1,
-                                      child: AnimatedContainer(
-                                        duration:
-                                            const Duration(milliseconds: 200),
-                                        width: 10,
-                                        height: 10,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(100.0),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Text.rich(
-                                      TextSpan(
-                                        children: [
-                                          TextSpan(text: greetingMessage),
-                                          TextSpan(
-                                              text:
-                                                  "${ref.watch(userProvider.notifier).state!.name.substring(0, 1).toUpperCase()}${ref.watch(userProvider.notifier).state!.name.substring(1)}!")
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 5.0,
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        GoRouter.of(context)
-                                            .pushNamed(
-                                                CFRouteNames.profileRouteName)
-                                            .then((value) {
-                                          if (value == true) {
-                                            getGraphs();
-                                          }
-                                          setState(() {});
-                                        });
-                                      },
-                                      child: CFAvatar(
-                                          name:
-                                              "assets/${ref.read(userProvider.notifier).state!.avatar}.png",
-                                          width: 40,
-                                          color: ref
-                                                      .read(
-                                                          userProvider.notifier)
-                                                      .state!
-                                                      .avatar ==
-                                                  "maleAvatar"
-                                              ? CFConstants.maleColor
-                                              : CFConstants.femaleColor,
-                                          isSelected: -1,
-                                          isBorder: false),
-                                    ),
-                                  ],
+                                const Spacer(
+                                  flex: 2,
                                 ),
                               ],
                             ),
-                          ),
-                          const Spacer(),
-                          Transform.scale(
-                            scale: 0.5,
-                            child: const CircularProgressIndicator(
-                              strokeWidth: 7.5,
-                            ),
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.only(top: 20.0),
-                            child: Text("Hang on, while we fetch your data!"),
-                          ),
-                          const Spacer(
-                            flex: 2,
-                          ),
-                        ],
-                      ),
-              ),
+                    )
+                  : const CFInsights(),
             ),
             bottomNavigationBar: BottomNavigationBar(
               selectedItemColor: Colors.blue.shade800,
               backgroundColor: Colors.white,
               currentIndex: bottomNavigationIndex,
               onTap: (value) {
+                if (value == 0) {
+                  setState(() {
+                    bottomNavigationIndex = 0;
+                  });
+                }
                 if (value == 1) {
+                  setState(() {
+                    bottomNavigationIndex = 1;
+                  });
+                }
+                if (value == 2) {
                   GoRouter.of(context)
                       .pushNamed(CFRouteNames.midasRouteName)
                       .then((value) {
@@ -612,6 +753,10 @@ class _CFHomeState extends ConsumerState<CFHome> {
                 }
               },
               items: const [
+                BottomNavigationBarItem(
+                  icon: Icon(FeatherIcons.home),
+                  label: "Home",
+                ),
                 BottomNavigationBarItem(
                   icon: Icon(FeatherIcons.barChart2),
                   label: "Insights",
@@ -710,32 +855,19 @@ class _CFHomeState extends ConsumerState<CFHome> {
                                 const SizedBox(
                                   width: 5.0,
                                 ),
-                                GestureDetector(
-                                  onTap: () {
-                                    GoRouter.of(context)
-                                        .pushNamed(
-                                            CFRouteNames.profileRouteName)
-                                        .then((value) {
-                                      if (value == true) {
-                                        getGraphs();
-                                      }
-                                      setState(() {});
-                                    });
-                                  },
-                                  child: CFAvatar(
-                                      name:
-                                          "assets/${ref.read(userProvider.notifier).state!.avatar}.png",
-                                      width: 40,
-                                      color: ref
-                                                  .read(userProvider.notifier)
-                                                  .state!
-                                                  .avatar ==
-                                              "maleAvatar"
-                                          ? CFConstants.maleColor
-                                          : CFConstants.femaleColor,
-                                      isSelected: -1,
-                                      isBorder: false),
-                                ),
+                                CFAvatar(
+                                    name:
+                                        "assets/${ref.read(userProvider.notifier).state!.avatar}.png",
+                                    width: 40,
+                                    color: ref
+                                                .read(userProvider.notifier)
+                                                .state!
+                                                .avatar ==
+                                            "maleAvatar"
+                                        ? CFConstants.maleColor
+                                        : CFConstants.femaleColor,
+                                    isSelected: -1,
+                                    isBorder: false),
                               ],
                             ),
                           ],
@@ -976,8 +1108,15 @@ class _CFHomeState extends ConsumerState<CFHome> {
   }
 }
 
-class ChartData {
-  ChartData(this.x, this.y);
+class PiechartData {
+  PiechartData(this.x, this.y, this.color);
   final String x;
+  final double y;
+  final Color color;
+}
+
+class LineChartData {
+  LineChartData(this.x, this.y);
+  final int x;
   final double y;
 }

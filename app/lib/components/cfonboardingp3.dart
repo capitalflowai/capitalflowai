@@ -17,7 +17,7 @@ class _CFOnboardingThreeState extends State<CFOnboardingThree> {
           margin: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
           decoration: BoxDecoration(
             // color: const Color.fromARGB(255, 248, 238, 213),
-            color: Color.fromARGB(255, 204, 181, 251),
+            color: const Color.fromARGB(255, 204, 181, 251),
             borderRadius: BorderRadius.circular(20.0),
           ),
           child: Stack(
@@ -38,10 +38,10 @@ class _CFOnboardingThreeState extends State<CFOnboardingThree> {
                       height: 10,
                     ),
                     Text(
-                      "Never again need to log your expense, we track it as you spend.Stay on top of your financial goals with personalized insights. Securely connect your bank accounts for real-time updates",
+                      "Never again need to log your expense, we track it as you spend. Stay on top of your financial goals with personalized insights.",
                       style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w300,
+                        fontSize: 17.0,
+                        fontWeight: FontWeight.w500,
                         color: Color.fromARGB(255, 91, 92, 96),
                       ),
                     ),

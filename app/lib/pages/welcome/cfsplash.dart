@@ -21,10 +21,13 @@ class CFSplash extends ConsumerStatefulWidget {
 }
 
 class _CFSplashState extends ConsumerState<CFSplash> {
+  bool selected = false;
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 1), checkLogin);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      checkLogin();
+    });
   }
 
   void checkLogin() async {
@@ -51,7 +54,7 @@ class _CFSplashState extends ConsumerState<CFSplash> {
             sliderData['budget'] =
                 ref.read(userProvider.notifier).state!.monthlyBudget;
             ref.read(userProvider.notifier).state!.spentRatio =
-                await CFServer.sliderGraph(sliderData);
+                CFServer.monthlyBudgetSlider(sliderData);
           }
         }
 
@@ -86,7 +89,19 @@ class _CFSplashState extends ConsumerState<CFSplash> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Image.asset("assets/logo.png"),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 70,
+              child: Image.asset("assets/logo.png"),
+            ),
+            const Text(
+              "CapitalFlow AI",
+              style: TextStyle(fontSize: 40.0),
+            ),
+          ],
+        ),
       ),
     );
   }

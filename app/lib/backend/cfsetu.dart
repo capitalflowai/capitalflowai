@@ -39,7 +39,7 @@ class SetuAPI {
           "Purpose": {
             "Category": {"type": "string"},
             "code": "101",
-            "text": "Loan underwriting",
+            "text": "Personal Wealth Management",
             "refUri": "https://api.rebit.org.in/aa/purpose/101.xml"
           },
           "fiTypes": ["DEPOSIT"]
@@ -92,7 +92,7 @@ class SetuAPI {
         "format": "json"
       }),
     );
-    print(response.body);
+
     return json.decode(response.body)['id'];
   }
 

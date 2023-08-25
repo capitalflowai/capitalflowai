@@ -45,8 +45,7 @@ class _CFWelcomeState extends State<CFWelcome> {
                     ),
                     Expanded(
                       child: Text(
-                        "Cut, Save and Thrive!",
-                        textAlign: TextAlign.justify,
+                        "What you measure grows. No manual input, no more hassle of uploading statements. Get started now by tracking your budget with us.",
                         style: TextStyle(
                           fontSize: 16.5,
                           fontWeight: FontWeight.w300,

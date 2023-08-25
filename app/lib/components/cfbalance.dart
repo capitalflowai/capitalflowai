@@ -29,10 +29,11 @@ class _CFBalanceState extends ConsumerState<CFBalance> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15.0),
         gradient: const RadialGradient(
-            colors: [CFConstants.cardBlue, CFConstants.cardwhite],
-            radius: 1.0,
-            center: Alignment.topRight,
-            stops: [0.2, 1]),
+          colors: [CFConstants.cardBlue, CFConstants.cardwhite],
+          radius: 1.0,
+          center: Alignment.topRight,
+          stops: [0.2, 1],
+        ),
         boxShadow: const [
           BoxShadow(
             spreadRadius: 4.0,
